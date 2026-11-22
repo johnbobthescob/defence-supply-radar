@@ -1,0 +1,17 @@
+{
+  "id": "fictional-henderson-marine-sme",
+  "version": 1,
+  "name": "Fictional Henderson Marine Services",
+  "fictional": true,
+  "public_fields": ["name", "capabilities", "activities", "service_regions"],
+  "capabilities": ["marine_electrical", "hydraulics_pneumatics", "corrosion_preservation"],
+  "activities": ["repair", "install", "supply"],
+  "service_regions": ["Henderson", "Garden Island", "Perth"],
+  "national_supply": true,
+  "credentials": {},
+  "exclusions": [],
+  "materials": [],
+  "processes": [],
+  "capacity": "",
+  "experience": []
+}

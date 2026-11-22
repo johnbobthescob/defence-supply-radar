@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "categories": {
+    "marine_electrical": {"label": "Marine electrical", "aliases": [], "weight": 2},
+    "fabrication_welding": {"label": "Fabrication and welding", "aliases": [], "weight": 2},
+    "precision_machining": {"label": "Precision machining", "aliases": [], "weight": 2},
+    "corrosion_preservation": {"label": "Corrosion and preservation", "aliases": [], "weight": 2},
+    "hydraulics_pneumatics": {"label": "Hydraulics and pneumatics", "aliases": [], "weight": 2},
+    "piping_fluid_systems": {"label": "Piping and fluid systems", "aliases": [], "weight": 2},
+    "propulsion_rotating_equipment": {"label": "Propulsion and rotating equipment", "aliases": [], "weight": 2},
+    "vessel_maintenance_docking": {"label": "Vessel maintenance and docking", "aliases": [], "weight": 2},
+    "hvac_refrigeration": {"label": "HVAC and refrigeration", "aliases": [], "weight": 2},
+    "instrumentation_controls": {"label": "Instrumentation and controls", "aliases": [], "weight": 2},
+    "inspection_assurance": {"label": "Inspection and assurance", "aliases": [], "weight": 2},
+    "lifting_access_support": {"label": "Lifting and access support", "aliases": [], "weight": 2},
+    "cleaning_environmental_services": {"label": "Cleaning and environmental services", "aliases": [], "weight": 2},
+    "engineering_logistics_support": {"label": "Engineering and logistics support", "aliases": [], "weight": 2}
+  }
+}

@@ -4,6 +4,15 @@ __pycache__/
 venv/
 data/raw/
 data/cache/
+data/*.sqlite3
+data/*.sqlite3-*
+data/state/
+data/review/
+data/profiles/
+out/*
+!out/sample/
+!out/sample/**
+!tests/fixtures/**
 *.log
 .env
 .env.*
