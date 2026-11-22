@@ -19,6 +19,8 @@ def test_opportunity_roundtrip_and_conservative_defaults():
     {"sources":[{**SRC,"accessed_at":"2026-11-22T10:00:00"}]},
     {"sources":[{**SRC,"snapshot_sha256":"bad"}]},
     {"unexpected":True},
+    {"sources":[]}, {"title":""}, {"freshness_state":"currentish"},
+    {"close_at_utc":"2026-12-01T00:00:00Z"},
 ])
 def test_opportunity_rejects_bad_fields(change):
     with pytest.raises(ValueError): Opportunity.from_dict({**BASE,**change})

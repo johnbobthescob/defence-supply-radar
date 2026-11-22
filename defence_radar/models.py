@@ -103,6 +103,9 @@ class Opportunity:
         if self.schema_version != 1 or isinstance(self.schema_version,bool): raise ValueError("schema_version: expected 1")
         for f in ("source_ids","classification_evidence","rule_ids","conditions","activities","rights","attribution","related_record_ids","warnings"): _list(getattr(self,f),f,str)
         if not self.source_ids: raise ValueError("source_ids: at least one source required")
+        for name in ("title", "summary", "programme", "buyer", "prime", "classification_reason"):
+            if not isinstance(getattr(self, name), str): raise ValueError(f"{name}: expected string")
+        if not self.title.strip(): raise ValueError("title: required")
         for name, cls in (("record_kind",RecordKind),("status_class",StatusClass),("lifecycle",Lifecycle),("review_state",ReviewState),("publication_state",PublicationState)):
             val=getattr(self,name)
             if val is None and name=="status_class": continue
@@ -110,12 +113,14 @@ class Opportunity:
             except (ValueError,TypeError): raise ValueError(f"{name}: invalid value {val!r}")
         if not isinstance(self.eligibility_complete,bool): raise ValueError("eligibility_complete: expected boolean")
         _list(self.sources,"sources")
+        if not self.sources: raise ValueError("sources: at least one evidence reference required")
         evidence_ids=set()
         for i,s in enumerate(self.sources):
             _dict(s,f"sources[{i}]")
             for k in ("source_id","url","accessed_at","evidence_id","snapshot_sha256","pointer"):
                 if k not in s: raise ValueError(f"sources[{i}].{k}: required")
             _identifier(s["source_id"],f"sources[{i}].source_id"); evidence_ids.add(s["source_id"])
+            _identifier(s["evidence_id"],f"sources[{i}].evidence_id")
             _url(s["url"],f"sources[{i}].url")
             utc_datetime(s["accessed_at"])
             if not isinstance(s["snapshot_sha256"],str) or not re.fullmatch(r"[0-9a-fA-F]{64}",s["snapshot_sha256"]): raise ValueError(f"sources[{i}].snapshot_sha256: expected 64 hex characters")
@@ -124,10 +129,16 @@ class Opportunity:
         for f in ("source_published_at","source_modified_at","first_seen_at","last_seen_at","verified_at","last_verification_attempt","close_at_utc"):
             if getattr(self,f) is not None: utc_datetime(getattr(self,f))
         if self.close_precision not in {"instant","date_only","range","ongoing_explicit","not_published","not_applicable"}: raise ValueError("close_precision: invalid value")
+        if self.close_at_utc and self.close_precision != "instant": raise ValueError("close_at_utc: requires instant precision")
+        if self.freshness_state not in {"fresh", "stale", "unknown"}: raise ValueError("freshness_state: invalid value")
+        for name in ("locations", "capabilities", "eligibility"):
+            _list(getattr(self, name), name, dict)
         for f in ("forecast_period","contract_period","application_route","value_context","evidence_flags"): _dict(getattr(self,f),f)
         route=self.application_route
         for k in ("purpose","url","email","instructions","verified_at","evidence_id","account_required"):
             if k not in route: raise ValueError(f"application_route.{k}: required")
+        if route["purpose"] not in {"submit", "procurement_eoi", "register_interest", "enquire", "none_published"}: raise ValueError("application_route.purpose: invalid value")
+        if route["account_required"] not in {"yes", "no", "unknown"}: raise ValueError("application_route.account_required: invalid value")
         if route["url"] is not None: _url(route["url"],"application_route.url")
         if route["email"] is not None and (not isinstance(route["email"],str) or not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+",route["email"])): raise ValueError("application_route.email: invalid email")
         if route["verified_at"] is not None: utc_datetime(route["verified_at"])
@@ -160,6 +171,10 @@ class SourcePolicy:
         _identifier(self.id,"id")
         if self.access_mode not in {"api","local_only","manual_reference","disabled"}: raise ValueError("access_mode: invalid value")
         if self.rights_status not in {"licensed","permission_documented","restricted","unverified"}: raise ValueError("rights_status: invalid value")
+        for name in ("allowed_audiences", "allowed_hosts", "allowed_path_prefixes"):
+            _list(getattr(self, name), name, str)
+        if self.rights_status in {"restricted", "unverified"} and self.allowed_audiences:
+            raise ValueError("allowed_audiences: restricted or unverified rights cannot grant publication")
         for v in self.allowed_audiences:
             if v not in {"research","public"}: raise ValueError("allowed_audiences: invalid value")
         for f in ("licence_url","terms_url"):
