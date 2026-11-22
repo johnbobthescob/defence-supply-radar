@@ -1,0 +1,30 @@
+{
+  "terminal.json": {
+    "original_url": "https://api.tenders.gov.au/ocds/findByDates/contractPublished/2026-10-01T00:00:00Z/2026-10-02T00:00:00Z",
+    "accessed_at": "Sun, 22 Nov 2026 08:10:56 GMT",
+    "original_body_sha256": "67cd3dbaaba8b21a704180afa86bb6f3bd0f30f9644ecb032a318affd9dad09c",
+    "original_release_count": 93,
+    "reduction": "Reduced terminal sample: National Indigenous Australians Agency, a DFAT contract amendment, and Department of Defence."
+  },
+  "page1.json": {
+    "original_url": "https://api.tenders.gov.au/ocds/findByDates/contractLastModified/2026-11-20T00:00:00Z/2026-11-21T00:00:00Z",
+    "accessed_at": "Sun, 22 Nov 2026 08:13:39 GMT",
+    "original_body_sha256": "a4ff0ee8f4caab343dd6bc0c8b8787c84fb18f33363ae293c3ddd3582f8f8f94",
+    "original_release_count": 100,
+    "reduction": "Two Department of Defence releases from the first last-modified page."
+  },
+  "page2.json": {
+    "original_url": "https://api.tenders.gov.au/ocds/findByDates/contractLastModified/2026-11-20T00:00:00Z/2026-11-21T00:00:00Z?cursor=VWak_KQoQW9OdzRxT2srNkVES1VOT05ESTRPVGszTlNsRFRqUXlPRGs1TnpVPWQ&prevcursor=initial&lastcursor=initial",
+    "accessed_at": "Sun, 22 Nov 2026 08:14:52 GMT",
+    "original_body_sha256": "50956dc4a5a95db2fa9d2ed1ddd49289fe9569080e7f1cc81580811fbd4f9211",
+    "original_release_count": 100,
+    "reduction": "Two Department of Defence releases, including one contract amendment, from the second last-modified page."
+  },
+  "by-id.json": {
+    "original_url": "https://api.tenders.gov.au/ocds/findById/CN4280056",
+    "accessed_at": "Sun, 22 Nov 2026 08:13:38 GMT",
+    "original_body_sha256": "5e9bf47a2db73dd2080096d6476a77e9b85dc31fcd501d158fbb0f9f1495fcc9",
+    "original_release_count": 1,
+    "reduction": "Single release returned by the findById endpoint."
+  }
+}

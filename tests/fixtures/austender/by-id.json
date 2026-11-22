@@ -1,0 +1,86 @@
+{
+  "uri": "https://api.tenders.gov.au/ocds/findById/CN4280056",
+  "publisher": {
+    "name": "Department of Finance"
+  },
+  "publishedDate": "2026-10-01T00:50:53Z",
+  "version": "1.1",
+  "releases": [
+    {
+      "ocid": "prod-c280ca270cf447ddaa9970022fc35ddd",
+      "id": "prod-c280ca270cf447ddaa9970022fc35ddd-826be22c1435333ea516d8e1b78bf87a",
+      "date": "2026-10-01T00:50:53Z",
+      "initiationType": "tender",
+      "language": "EN",
+      "parties": [
+        {
+          "roles": [
+            "supplier"
+          ]
+        },
+        {
+          "id": "0ec9911c9e99d1b7bb1b77f4abffc583",
+          "name": "Department of Defence",
+          "roles": [
+            "procuringEntity"
+          ],
+          "additionalIdentifiers": [
+            {
+              "id": "62950639680",
+              "scheme": "AU-ABN"
+            }
+          ]
+        }
+      ],
+      "awards": [
+        {
+          "id": "CN4280056-af93863ce6944f2a98bdfdc384a66c8a",
+          "suppliers": [
+            {}
+          ],
+          "status": "active",
+          "date": "2026-10-01T00:50:53Z"
+        }
+      ],
+      "contracts": [
+        {
+          "id": "CN4280056",
+          "awardID": "CN4280056-af93863ce6944f2a98bdfdc384a66c8a",
+          "dateSigned": "2026-10-01T00:50:53Z",
+          "description": "Electronic Equipment",
+          "title": "NABPurch000063486764",
+          "items": [
+            {
+              "id": "32130000-af93863ce6944f2a98bdfdc384a66c8a",
+              "classification": {
+                "scheme": "UNSPSC",
+                "id": "32130000"
+              }
+            }
+          ],
+          "period": {
+            "startDate": "2026-09-30T14:00:00Z",
+            "endDate": "2026-09-30T14:00:00Z"
+          },
+          "value": {
+            "currency": "AUD",
+            "amount": "16152.72"
+          },
+          "status": "active"
+        }
+      ],
+      "tag": [
+        "contract"
+      ],
+      "tender": {
+        "id": "prod-c280ca270cf447ddaa9970022fc35ddd",
+        "procurementMethod": "limited",
+        "procurementMethodDetails": "Limited tender",
+        "limitedTenderExempt": "1"
+      }
+    }
+  ],
+  "extensions": [
+    "http://cdn.tenders.gov.au/ocds/schema/extension.json"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "url": "https://api.tenders.gov.au/ocds/findByDates/contractPublished/2026-10-01T00:00:00Z/2026-10-02T00:00:00Z",
+  "final_url": "https://api.tenders.gov.au/ocds/findByDates/contractPublished/2026-10-01T00:00:00Z/2026-10-02T00:00:00Z",
+  "status": 200,
+  "accessed_at": "2026-11-22T08:10:56Z",
+  "headers": {
+    "Content-Type": "application/json",
+    "Date": "Sun, 22 Nov 2026 08:10:56 GMT"
+  }
+}

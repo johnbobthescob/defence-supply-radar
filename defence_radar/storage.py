@@ -28,6 +28,14 @@ def material_state(record):
     route = dict(data.get("application_route", {}))
     route.pop("verified_at", None)
     data["application_route"] = route
+    # Licence provenance may be enriched by a date package for an identical release.
+    if data.get("source_ids") == ["austender"]:
+        flags = dict(data.get("evidence_flags", {}))
+        for key in ("licence_declared", "package_licence", "licence_evidence"):
+            flags.pop(key, None)
+        data["evidence_flags"] = flags
+        data.pop("attribution", None)
+        data["warnings"] = [w for w in data.get("warnings", []) if not w.startswith(("Package has no established licence", "This response omits the licence"))]
     return data
 
 

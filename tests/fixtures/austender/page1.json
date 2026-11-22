@@ -1,0 +1,164 @@
+{
+  "uri": "https://api.tenders.gov.au/ocds/findByDates/contractLastModified/2026-11-20T00:00:00Z/2026-11-21T00:00:00Z",
+  "publisher": {
+    "name": "Department of Finance"
+  },
+  "publishedDate": "2026-11-20T08:12:49Z",
+  "license": "https://creativecommons.org/licenses/by/3.0/au/",
+  "version": "1.1",
+  "releases": [
+    {
+      "ocid": "prod-4949a65565e94be4b101169b542df674",
+      "id": "prod-4949a65565e94be4b101169b542df674-e8cf496c5ea13ddeaa2746fd1962338b",
+      "date": "2026-11-20T08:12:39Z",
+      "initiationType": "tender",
+      "language": "EN",
+      "parties": [
+        {
+          "roles": [
+            "supplier"
+          ]
+        },
+        {
+          "id": "0eca64a1a9598906e1643767589ebde7",
+          "name": "Department of Foreign Affairs and Trade",
+          "roles": [
+            "procuringEntity"
+          ],
+          "additionalIdentifiers": [
+            {
+              "id": "47065634525",
+              "scheme": "AU-ABN"
+            }
+          ]
+        }
+      ],
+      "awards": [
+        {
+          "id": "CN4290093-60b2a14557b64d97866333f821e8f8ff",
+          "suppliers": [
+            {}
+          ],
+          "status": "active",
+          "date": "2026-11-20T08:12:39Z"
+        }
+      ],
+      "contracts": [
+        {
+          "id": "CN4290093",
+          "awardID": "CN4290093-60b2a14557b64d97866333f821e8f8ff",
+          "dateSigned": "2026-11-20T08:12:39Z",
+          "description": "Legal Services",
+          "title": "4600031512",
+          "items": [
+            {
+              "id": "80120000-60b2a14557b64d97866333f821e8f8ff",
+              "classification": {
+                "scheme": "UNSPSC",
+                "id": "80120000"
+              }
+            }
+          ],
+          "period": {
+            "startDate": "2026-11-10T13:00:00Z",
+            "endDate": "2027-02-27T13:00:00Z"
+          },
+          "value": {
+            "currency": "AUD",
+            "amount": "10000.00"
+          },
+          "status": "active"
+        }
+      ],
+      "tag": [
+        "contract"
+      ],
+      "tender": {
+        "id": "prod-4949a65565e94be4b101169b542df674",
+        "procurementMethod": "limited",
+        "procurementMethodDetails": "Limited tender",
+        "limitedTenderExempt": "1"
+      }
+    },
+    {
+      "ocid": "prod-1b51b920ae0d4bfcbad0062a9c792f08",
+      "id": "prod-1b51b920ae0d4bfcbad0062a9c792f08-fc03c6822cfb308b99991b819ea30891",
+      "date": "2026-11-20T08:12:39Z",
+      "initiationType": "tender",
+      "language": "EN",
+      "parties": [
+        {
+          "roles": [
+            "supplier"
+          ]
+        },
+        {
+          "id": "0eca64a1a9598906e1643767589ebde7",
+          "name": "Department of Foreign Affairs and Trade",
+          "roles": [
+            "procuringEntity"
+          ],
+          "additionalIdentifiers": [
+            {
+              "id": "47065634525",
+              "scheme": "AU-ABN"
+            }
+          ]
+        }
+      ],
+      "awards": [
+        {
+          "id": "CN4290094-cbd6c21af4b74d44b4c36989943e2910",
+          "suppliers": [
+            {}
+          ],
+          "status": "active",
+          "date": "2026-11-20T08:12:39Z"
+        }
+      ],
+      "contracts": [
+        {
+          "id": "CN4290094",
+          "awardID": "CN4290094-cbd6c21af4b74d44b4c36989943e2910",
+          "dateSigned": "2026-11-20T08:12:39Z",
+          "description": "Sports equipment and accessories",
+          "title": "4600031506",
+          "items": [
+            {
+              "id": "49220000-cbd6c21af4b74d44b4c36989943e2910",
+              "classification": {
+                "scheme": "UNSPSC",
+                "id": "49220000"
+              }
+            }
+          ],
+          "period": {
+            "startDate": "2026-11-16T13:00:00Z",
+            "endDate": "2027-06-29T14:00:00Z"
+          },
+          "value": {
+            "currency": "AUD",
+            "amount": "55825.79"
+          },
+          "status": "active"
+        }
+      ],
+      "tag": [
+        "contract"
+      ],
+      "tender": {
+        "id": "prod-1b51b920ae0d4bfcbad0062a9c792f08",
+        "procurementMethod": "limited",
+        "procurementMethodDetails": "Limited tender",
+        "limitedTenderExempt": "1"
+      }
+    }
+  ],
+  "extensions": [
+    "http://cdn.tenders.gov.au/ocds/schema/extension.json"
+  ],
+  "links": {
+    "self": "https://api.tenders.gov.au/ocds/findByDates/contractLastModified/2026-11-20T00:00:00Z/2026-11-21T00:00:00Z",
+    "next": "https://api.tenders.gov.au/ocds/findByDates/contractLastModified/2026-11-20T00:00:00Z/2026-11-21T00:00:00Z?cursor=VWak_KQoQW9OdzRxT2srNkVES1VOT05ESTRPVGszTlNsRFRqUXlPRGs1TnpVPWQ&prevcursor=initial&lastcursor=initial"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "url": "https://api.tenders.gov.au/ocds/findByDates/contractLastModified/2026-11-20T00:00:00Z/2026-11-21T00:00:00Z?cursor=VWak_KQoQW9OdzRxT2srNkVES1VOT05ESTRPVGszTlNsRFRqUXlPRGs1TnpVPWQ&prevcursor=initial&lastcursor=initial",
+  "final_url": "https://api.tenders.gov.au/ocds/findByDates/contractLastModified/2026-11-20T00:00:00Z/2026-11-21T00:00:00Z?cursor=VWak_KQoQW9OdzRxT2srNkVES1VOT05ESTRPVGszTlNsRFRqUXlPRGs1TnpVPWQ&prevcursor=initial&lastcursor=initial",
+  "status": 200,
+  "accessed_at": "2026-11-22T08:14:52Z",
+  "headers": {
+    "Content-Type": "application/json",
+    "Date": "Sun, 22 Nov 2026 08:14:52 GMT"
+  }
+}

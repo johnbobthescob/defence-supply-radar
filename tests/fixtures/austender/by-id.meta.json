@@ -1,0 +1,10 @@
+{
+  "url": "https://api.tenders.gov.au/ocds/findById/CN4280056",
+  "final_url": "https://api.tenders.gov.au/ocds/findById/CN4280056",
+  "status": 200,
+  "accessed_at": "2026-11-22T08:13:38Z",
+  "headers": {
+    "Content-Type": "application/json",
+    "Date": "Sun, 22 Nov 2026 08:13:38 GMT"
+  }
+}
