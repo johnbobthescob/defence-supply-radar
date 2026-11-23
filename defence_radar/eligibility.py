@@ -19,9 +19,9 @@ def extract_requirements(text, evidence_id, verified_at):
         keys = [key for key, pat in patterns.items() if re.search(pat, clause, re.I)] or ["unmapped_requirement"]
         uncertain = bool(re.search(r"\b(may|might|where applicable|subject to)\b", clause, re.I)) or (required and preferred)
         for key in keys:
-            level = re.search(r"\blevel\s+(\d+)\b", clause, re.I) if key == "disp" else None
+            level = re.search(r"\bDISP\s+(?:membership\s+)?level\s*(\d+)\b", clause, re.I) if key == "disp" else None
             found.append(dict(key=key, text=clause.strip(), strength="unknown" if uncertain else "required" if required else "preferred",
-                              expected=("level " + level[1]) if level else True, evidence_id=evidence_id, verified_at=verified_at))
+                              expected=("level_" + level[1]) if level else True, evidence_id=evidence_id, verified_at=verified_at))
     return found
 
 
@@ -42,7 +42,7 @@ def evaluate(record, profile, as_of):
                 state, reason = "failed", "Supplied credential has expired."
             elif credential.get("value") is None:
                 reason = "Credential value is unknown."
-            elif credential.get("value") == requirement.get("expected", True):
+            elif type(credential.get("value")) is type(requirement.get("expected", True)) and credential.get("value") == requirement.get("expected", True):
                 state, reason = "passed", "Matches current user-supplied evidence; not independently certified."
             else:
                 state, reason = "failed", "Supplied value does not meet the stated criterion."

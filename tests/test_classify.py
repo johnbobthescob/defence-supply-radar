@@ -94,4 +94,4 @@ def test_extraction_does_not_convert_trade_list_to_requirements():
     req = extract_requirements("Suppliers must hold ISO 9001. OEM approval preferred. DISP not required.", "e1", NOW)
     assert [(r["key"], r["strength"]) for r in req] == [("iso9001", "required"), ("oem_authorisation", "preferred")]
     assert extract_requirements("DISP may be required", "e1", NOW)[0]["strength"] == "unknown"
-    assert extract_requirements("DISP Level 2 is required", "e1", NOW)[0]["expected"] == "level 2"
+    assert extract_requirements("DISP Level 2 is required", "e1", NOW)[0]["expected"] == "level_2"
