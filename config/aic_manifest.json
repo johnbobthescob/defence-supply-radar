@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "index": {
+    "url": "https://www.defence.gov.au/business-industry/finding-opportunities/public-australian-industry-capability-plans",
+    "path": "data/raw/2026-11-22/aic-index.body",
+    "sha256": "0bffa49ea2ef67442fd11a885bf329145ee01b324f8258979ad8f2240ddc5152",
+    "accessed_at": "2026-11-22T08:11:55+00:00"
+  },
+  "documents": [
+    {
+      "id": "rmp-west",
+      "url": "https://www.defence.gov.au/sites/default/files/aic/2025-02/RMP-W-PublicAICPlan.pdf",
+      "text_path": "data/raw/2026-11-22/aic-rmp-west.txt",
+      "text_sha256": "70abbae2f3929298b5435718c4bc613b62381dd33cfe055f5be286583ff55934",
+      "pdf_path": "data/raw/2026-11-22/aic-rmp-west.pdf",
+      "pdf_sha256": "cba87568f207d6d9bacf2bd5f257f873e26c209190ab36ad4aa8d5cdf2dfa0b5",
+      "accessed_at": "2026-11-22T08:11:55+00:00",
+      "issue_date": null,
+      "server_last_modified": "Wed, 12 Feb 2025 05:49:10 GMT",
+      "revision": null,
+      "rights_source_id": "aic",
+      "reviews_file": "data/review/aic-scopes-rmp-west.json"
+    },
+    {
+      "id": "hunter",
+      "url": "https://www.defence.gov.au/sites/default/files/aic/2025-04/BAESystemsMaritimeAustraliaPublicAICPlan.pdf",
+      "text_path": "data/raw/2026-11-22/aic-hunter.txt",
+      "text_sha256": "9fdac8fd5cfcc13549dea8999a4e766fa58b869b7e3365d4385c7c3b0f6d039c",
+      "pdf_path": "data/raw/2026-11-22/aic-hunter.pdf",
+      "pdf_sha256": "157068c6fa12eaad0623f52bc591fcb18e23b4526ca267a2538578863164b9a1",
+      "accessed_at": "2026-11-22T08:11:57+00:00",
+      "issue_date": "2025-04-22",
+      "server_last_modified": "Mon, 28 Apr 2025 03:07:15 GMT",
+      "revision": null,
+      "rights_source_id": "aic",
+      "reviews_file": "data/review/aic-scopes-hunter.json"
+    },
+    {
+      "id": "austal-ssa",
+      "url": "https://www.defence.gov.au/sites/default/files/aic/2026-04/Annex-Public%20Australian-Industry-Capability-SSA-MSTS.pdf",
+      "text_path": "data/raw/2026-11-22/aic-austal-ssa.txt",
+      "text_sha256": "f9c217213ee2c26c88c5682f15e8e8ed4726a77e7b9a3dd745aa1d70df8c5f78",
+      "pdf_path": "data/raw/2026-11-22/aic-austal-ssa.pdf",
+      "pdf_sha256": "788862cd9ec97ba80b5053e1259a2b02da4f605a4484ed04460cfe91fb8b3d8a",
+      "accessed_at": "2026-11-22T08:11:56+00:00",
+      "issue_date": null,
+      "server_last_modified": "Mon, 20 Apr 2026 12:02:15 GMT",
+      "revision": null,
+      "rights_source_id": "aic",
+      "reviews_file": "data/review/aic-scopes-austal-ssa.json"
+    },
+    {
+      "id": "lm2500",
+      "url": "https://www.defence.gov.au/sites/default/files/aic/2026-04/LM2500GasTurbinesInServieSupportContractGeneralElectricAviationSystemsAustraliaPtyLtd-AICPublicPlan.pdf",
+      "text_path": "data/raw/2026-11-22/aic-lm2500.txt",
+      "text_sha256": "4f09b0e6cb866afeeb5ad05414d735202ddd3f30900fe0f65365abd8d77036a2",
+      "pdf_path": "data/raw/2026-11-22/aic-lm2500.pdf",
+      "pdf_sha256": "c1e059fc98daaa16a76bd5741c70e41bd1644e72d5dd70301110c90ad0df349d",
+      "accessed_at": "2026-11-22T08:11:56+00:00",
+      "issue_date": "2026-04-14",
+      "server_last_modified": "Tue, 21 Apr 2026 02:33:44 GMT",
+      "revision": "2",
+      "rights_source_id": "aic",
+      "reviews_file": "data/review/aic-scopes-lm2500.json"
+    }
+  ]
+}

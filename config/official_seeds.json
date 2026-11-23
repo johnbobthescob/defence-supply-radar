@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "candidates": [
+    {"id":"aic-index","url":"https://www.defence.gov.au/business-industry/finding-opportunities/public-australian-industry-capability-plans","source_id":"aic","enabled":false,"reason":"Official index link; destination contents are not reviewed for a seed record."},
+    {"id":"asa-industry","url":"https://www.asa.gov.au/industry","source_id":"asa","enabled":false,"reason":"Saved ASA industry hub; destination contents are not reviewed as opportunity facts."},
+    {"id":"asa-henderson","url":"https://www.asa.gov.au/projects/henderson-defence-precinct","source_id":"asa","enabled":false,"reason":"Link visible on saved ASA industry page; destination contents are not reviewed."},
+    {"id":"asa-srf-west","url":"https://www.asa.gov.au/projects/submarine-rotational-force-west-infrastructure-project","source_id":"asa","enabled":false,"reason":"Link visible on saved ASA industry page; destination contents are not reviewed."},
+    {"id":"asa-security","url":"https://www.asa.gov.au/industry-security","source_id":"asa","enabled":false,"reason":"Link visible on saved ASA industry page; destination contents are not reviewed."},
+    {"id":"asa-qualification","url":"https://www.asa.gov.au/industry-qualification-pathways","source_id":"asa","enabled":false,"reason":"Link visible on saved ASA industry page; destination contents are not reviewed."},
+    {"id":"asa-engagement","url":"https://www.asa.gov.au/industry-engagement","source_id":"asa","enabled":false,"reason":"Link visible on saved ASA industry page; destination contents are not reviewed."}
+  ],
+  "records": []
+}

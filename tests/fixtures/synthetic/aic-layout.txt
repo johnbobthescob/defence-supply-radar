@@ -1,0 +1,7 @@
+Synthetic AIC layout, authored for tests only.
+Register interest for future briefings. This is engagement, not procurement.
+Existing supplier: Marine Example Pty Ltd — context only.
+Future scope: component maintenance may be considered subject to commercial viability.
+Open scope: local fabrication package described in the plan.
+LCM AIA-1: LCH entry appears inconsistent with LCM elsewhere.
+Contact: Janina Hildebrandt@geaerospace.example
