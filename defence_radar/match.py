@@ -6,7 +6,7 @@ from .eligibility import evaluate
 from .models import Opportunity, MatchResult
 
 RULE_VERSION = "match-1"
-MARINE_CONTEXT = re.compile(r"\b(marine|maritime|naval|vessels?|ship\w*|submarines?|frigates?|boats?|hmas|rmp west)\b", re.I)
+MARINE_CONTEXT = re.compile(r"\b(marine|maritime|naval|vessels?|ship(?:s|board|building)?|submarines?|frigates?|boats?|hmas|rmp west)\b", re.I)
 
 
 def normal(text):

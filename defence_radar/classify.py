@@ -105,7 +105,14 @@ def classify(record, as_of):
         if age > timedelta(days=30):
             return decide("STALE_PLAN", "Published scope is overdue for the 30-day review; present availability is unverified.", held=True)
         forecast_end = result.forecast_period.get("end")
-        if forecast_end and utc_datetime(forecast_end) < now:
+        forecast_expired = False
+        if forecast_end:
+            try:
+                forecast_expired = utc_datetime(forecast_end) < now
+            except ValueError:
+                if re.fullmatch(r"\d{4}-\d{2}-\d{2}", forecast_end):
+                    forecast_expired = datetime.fromisoformat(forecast_end).date() < now.date()
+        if forecast_expired:
             return decide("PAST_FORECAST", "Indicative forecast period has elapsed; updated planning evidence is required.", held=True)
         return decide("FUTURE", "Official published future/ongoing scope; current availability and any bid invitation are not established. Conditions remain applicable.", "published_future_scope", "ongoing_scope" if result.lifecycle == Lifecycle.ongoing_scope else "planned")
     if result.record_kind == RecordKind.hypothesis and flags.get("hypothesis_reason") and flags.get("missing_evidence") and age <= timedelta(days=30):

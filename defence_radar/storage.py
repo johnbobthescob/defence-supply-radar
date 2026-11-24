@@ -13,7 +13,7 @@ from .models import Opportunity, SourcePolicy, utc_iso
 def _time(value):
     if isinstance(value, datetime):
         if value.tzinfo is None: raise ValueError("timestamps must be timezone-aware")
-        return value.astimezone(timezone.utc).isoformat()
+        return utc_iso(value)
     if value is None: return datetime.now(timezone.utc).isoformat()
     try: return utc_iso(value)
     except ValueError: return str(value)
@@ -100,7 +100,7 @@ class Repository:
         return sid
 
     def add_release(self, ocid, release_id, payload, snapshot_id, event_at):
-        h = digest(payload); event = _time(event_at)
+        h = digest(payload); event = _time(event_at) if event_at else ""
         with self._tx():
             cur = self.connection.execute("INSERT OR IGNORE INTO releases(ocid,release_id,hash,payload,snapshot_id,event_at) VALUES(?,?,?,?,?,?)",
                                           (ocid,release_id,h,canonical_json(payload),snapshot_id,event))
@@ -156,9 +156,17 @@ class Repository:
     def _window(self, source_id, field, start, end, snapshots, releases, records, at, live=True):
         snapshot_ids={}
         for snap in snapshots: snapshot_ids[snap.get("id") or digest(snap)] = self.add_snapshot(snap)
+        conflicts = set()
         for rel in releases:
-            self.add_release(rel["ocid"],rel["release_id"],rel["payload"],rel["snapshot_id"],rel["event_at"])
-        for rec in records: self._save_record(rec)
+            result = self.add_release(rel["ocid"],rel["release_id"],rel["payload"],rel["snapshot_id"],rel["event_at"])
+            if result["conflict"]: conflicts.add((rel["ocid"], rel["release_id"]))
+        for rec in records:
+            if (rec.evidence_flags.get("ocid"), rec.evidence_flags.get("release_id")) in conflicts:
+                rec.evidence_flags["conflicting_versions"] = True
+                rec.review_state = "needs_review"
+                rec.publication_state = "held"
+                rec.validate()
+            self._save_record(rec)
         result = self._record_run(source_id,field,start,end,"complete",at,len(snapshots),len(releases),None,live)
         if live:
             prior=self.checkpoint(source_id,field)

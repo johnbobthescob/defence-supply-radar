@@ -71,3 +71,15 @@ def test_snapshot_headers_and_run_errors_sanitized(tmp_path):
     with Repository(tmp_path/"db.sqlite") as repo:
         repo.record_run("s1","x","a","b","failed","now",error="authorization=secret")
         assert "secret" not in str(repo.runs())
+
+
+def test_same_release_changed_payload_holds_normalized_record(tmp_path):
+    with Repository(tmp_path/"db") as repo:
+        sid = repo.add_snapshot({"source_id": "s1", "sha256": "x"})
+        rel = dict(ocid="o", release_id="r", payload={"x": 1}, snapshot_id=sid, event_at="2026-01-01T00:00:00Z")
+        rec = record(evidence_flags={"ocid": "o", "release_id": "r"}, verified_at="2026-01-01T00:00:00Z")
+        repo.complete_window("s1", "field", "a", "b", [], [rel], [rec], "2026-01-02T00:00:00Z")
+        rel["payload"] = {"x": 2}
+        repo.complete_window("s1", "field", "a", "b", [], [rel], [rec], "2026-01-03T00:00:00Z")
+        assert repo.get_record(rec.id).evidence_flags["conflicting_versions"]
+        assert repo.get_record(rec.id).review_state.value == "needs_review"

@@ -33,6 +33,7 @@ def test_no_keyword_repetition_credit_and_no_inferred_machining():
     assert "precision_machining" not in {t["id"] for t in tag_scope("Marine engine component repair", TAX, "e1")}
     assert tag_scope("Existing marine hydraulic hose supplier", TAX, "e1", existing_supplier=True) == []
     assert tag_scope("Marine work excluding hydraulic hose", TAX, "e1") == []
+    assert tag_scope("Shipment of hydraulic hose", TAX, "e1") == []
 
 
 def test_supplier_location_and_activity_mismatch():
