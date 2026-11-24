@@ -25,6 +25,8 @@ def parse_close(raw, zone=None):
         if value.tzinfo is None:
             if not zone:
                 return result
+            if zone != "UTC" and "/" not in zone:
+                return result  # Abbreviations such as EST do not identify the source zone.
             tz = ZoneInfo(zone)
             a, b = value.replace(tzinfo=tz, fold=0), value.replace(tzinfo=tz, fold=1)
             if a.utcoffset() != b.utcoffset():

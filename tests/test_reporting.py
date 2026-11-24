@@ -64,6 +64,8 @@ def test_private_profile_and_match_credentials_are_omitted_by_default():
     assert "PRIVATE_SENTINEL" not in exported
     assert "credentials" not in payload["profile"]
     assert payload["rows"][0]["match"]["profile_hash"] == digest(p.to_dict())
+    assert payload["rows"][0]["match"]["components"]["activity"] == 0
+    assert "fictional-test-profile" not in exported
 
 
 def test_csv_formula_cells_are_escaped_but_json_keeps_originals():

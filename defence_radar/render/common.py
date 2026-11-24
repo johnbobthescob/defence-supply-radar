@@ -55,6 +55,7 @@ def eligibility_label(match):
 
 def source_summaries(record):
     return [{"source_id": s.get("source_id"), "url": safe_url(s.get("url")),
+             "notice_id": s.get("notice_id"), "release_id": s.get("release_id"),
              "accessed_at": s.get("accessed_at"), "pointer": s.get("pointer"),
              "snapshot_sha256": s.get("snapshot_sha256"), "licence_url": safe_url(s.get("licence_url"))}
             for s in record.get("sources", [])]

@@ -70,6 +70,7 @@ def test_dst_dates_and_ambiguous_local_time():
     assert parse_close("2026-04-05T02:30:00", "Australia/Sydney")["close_at_utc"] is None
     assert parse_close("2026-10-04T02:30:00", "Australia/Sydney")["close_at_utc"] is None
     assert parse_close("2026-12-01T17:00:00")["close_at_utc"] is None
+    assert parse_close("2026-12-01T17:00:00", "EST")["close_at_utc"] is None
     assert parse_close("2026-12-01")["close_precision"] == "date_only"
     assert parse_close("Login to view")["close_at_utc"] is None
 

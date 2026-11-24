@@ -23,10 +23,12 @@ def _profile_for_match(profile, audience):
     if audience != "public":
         return profile
     data = profile.to_dict() if hasattr(profile, "to_dict") else dict(profile)
-    if "credentials" not in data.get("public_fields", []):
-        data["credentials"] = {}
-        return Profile.from_dict(data)
-    return profile
+    visible = set(data.get("public_fields", []))
+    for key, empty in {"credentials": {}, "capabilities": [], "activities": [], "service_regions": [],
+                       "national_supply": False, "exclusions": [], "materials": [], "processes": [],
+                       "experience": [], "capacity": ""}.items():
+        if key not in visible: data[key] = empty
+    return Profile.from_dict(data)
 
 
 def _public_sources(record, policies):
