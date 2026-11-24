@@ -138,7 +138,7 @@ def fetch_window(repo, client, raw_root, field, start, end, at, *, max_pages=100
                 raise ValueError("Page cap reached before terminal page")
             seen.add(_url_key(url))
             response = client.get(url, expected_path=expected_path)
-            snapshot = save_snapshot(raw_root, "austender", url, response.body, at,
+            snapshot = save_snapshot(raw_root, "austender", url, response.body, utc_iso(client.clock()),
                                      headers=response.headers, final_url=response.url)
             snapshots.append(snapshot)
             # Evidence remains available after partial failure; current records promote only at completion.

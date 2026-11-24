@@ -9,6 +9,7 @@ from defence_radar.http_client import HttpClient, Response, FetchError
 from defence_radar.ingest.austender import (parse_package, normalize, fetch_window, date_url,
                                            replay_saved, incremental_start)
 from defence_radar.storage import Repository
+from defence_radar.models import utc_datetime
 
 FIX = Path(__file__).parent / "fixtures/austender"
 AT = "2026-11-22T09:00:00Z"
@@ -23,6 +24,7 @@ def client(responses, **kwargs):
         calls.append(url)
         response = responses[len(calls)-1]
         return Response(response[0], response[1], response[2], url)
+    kwargs.setdefault("clock", lambda: utc_datetime(AT))
     return HttpClient(POLICY, transport=transport, sleeper=sleeps.append, min_gap=0, **kwargs), calls, sleeps
 
 
