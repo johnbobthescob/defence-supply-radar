@@ -62,7 +62,7 @@ def market_summary(rows, week, taxonomy):
         for e in d.values(): e["value"] = round(e["value"], 2)
     return {"window": week, "awards_in_week": len(in_week), "relevant_awards_total": len(awards),
             "total_value": round(sum(_amount(r["record"]) or 0.0 for r in scope), 2), "currency": "AUD",
-            "suppliers": order(suppliers), "buyers": sorted(buyers.values(), key=lambda x: (-x["count"], -x["value"], x["name"])), "capabilities": order(caps),
+            "suppliers": sorted(suppliers.values(), key=lambda x: (-x["count"], -x["best_score"], -x["value"], x["name"])), "buyers": sorted(buyers.values(), key=lambda x: (-x["count"], -x["value"], x["name"])), "capabilities": order(caps),
             "wa_suppliers": [e for e in order(suppliers) if e["region"] == "WA"],
             "note": "Awarded contract notices published on AusTender in the reporting week. Values are the head-contract value "
                     "reported by the agency, not available subcontract spend. These are not open opportunities."}

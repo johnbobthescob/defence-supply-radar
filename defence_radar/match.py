@@ -216,7 +216,7 @@ def match(record, profile, taxonomy, as_of):
         elif not places and goods and profile.national_supply and "supply" in profile.activities:
             comp["delivery"] = 8; reasons.append("+8 goods can be shipped; national supply declared (delivery location not published)")
         else:
-            reasons.append("+0 delivery location not published")
+            evidence.append("Delivery location not published.")
     sup = flags.get("suppliers") or []
     wa = [s["name"] for s in sup if isinstance(s, dict) and s.get("region") == "WA"]
     if wa: evidence.append("Supplier based in WA (incumbent/teaming lead, not a worksite): " + ", ".join(wa))

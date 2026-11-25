@@ -12,9 +12,13 @@ from .evidence import digest
 from .models import utc_datetime, utc_iso
 from .reporting import prepare_payload, record_states
 from .render.briefing import render_briefing
+from .render.briefing_html import render_briefing_html
 from .render.exports import render_json, render_csv
 from .render.html_list import render_html
 from .render.assessment import render_assessment_md, render_assessment_html
+
+
+ATM = "austender_atm"
 
 
 class StrictCoverageError(ValueError):
@@ -42,12 +46,13 @@ def _coverage(repo, policies, as_of):
         sid = data.get("id")
         sruns = [r for r in runs if r["source_id"] == sid]
         latest = next((r for r in reversed(safe_runs) if r["source_id"] == sid), None)
-        successful = [r for r in sruns if r["state"] == "complete" and r.get("live")]
+        # The ATM feed is normally an operator-saved import (the host refuses automated clients).
+        successful = [r for r in sruns if r["state"] == "complete" and (r.get("live") or sid == ATM)]
         result["sources"].append({"id": sid, "access_mode": data.get("access_mode"), "rights_status": data.get("rights_status"),
             "allowed_audiences": data.get("allowed_audiences", []), "latest_run": latest,
             "last_successful_refresh": successful[-1]["at"] if successful else None})
         for run in sruns:
-            if run["state"] != "complete":
+            if run["state"] != "complete" and sid != ATM:
                 covering = any(c["state"] == "complete" and c.get("live") and c.get("field") == run.get("field")
                     and c.get("start", "") <= run.get("start", "") and c.get("end", "") >= run.get("end", "")
                     and c.get("at", "") >= run.get("at", "") for c in sruns)
@@ -55,18 +60,28 @@ def _coverage(repo, policies, as_of):
     result["review_held"] = sum(1 for r in records if getattr(r, "publication_state", None) and str(r.publication_state) == "held")
     if not any(p.id == "austender" for p in policies):
         result["warnings"].append("AusTender contract-notice source policy is missing.")
-    result["warnings"].append("Current APP/ATM open-tender feed is unavailable; coverage is not complete.")
+    atm = next((s for s in result["sources"] if s["id"] == ATM), None)
+    atm_at = atm and atm["last_successful_refresh"]
+    if not atm:
+        result["warnings"].append("Open-tender source (AusTender current-ATM feed) is not configured; open opportunities are not covered.")
+    elif not atm_at:
+        result["warnings"].append("AusTender current-ATM feed has not been imported, so open tenders are not covered this build. Save the feed and run `ingest atm-rss --file` (docs/OPEN-TENDER-SOURCE.md).")
+    elif utc_datetime(as_of) - utc_datetime(atm_at) > timedelta(hours=48):
+        result["warnings"].append(f"AusTender current-ATM feed was last imported {atm_at}; listings older than 48 hours are held. Re-import today's feed.")
+    result["open_tender_feed"] = {"source": ATM, "last_import": atm_at, "fresh": bool(atm_at) and utc_datetime(as_of) - utc_datetime(atm_at) <= timedelta(hours=48)}
+    result["warnings"].append("Annual procurement plans (APPs) and prime-contractor work packages (e.g. ICN Gateway) are not ingested.")
     result["warnings"].append("AIC-derived content remains rights-held for public distribution.")
     cutoff = utc_datetime(as_of) - timedelta(days=7)
     for p in policies:
         if getattr(p, "access_mode", None) == "disabled": result["warnings"].append(f"Source {p.id} is disabled by policy.")
     for src in result["sources"]:
-        if src["access_mode"] not in {"disabled", "local_only", "manual_reference"} and src["last_successful_refresh"] and utc_datetime(src["last_successful_refresh"]) < cutoff:
+        if src["id"] != ATM and src["access_mode"] not in {"disabled", "local_only", "manual_reference"} and src["last_successful_refresh"] and utc_datetime(src["last_successful_refresh"]) < cutoff:
             src["stale"] = True
             result["warnings"].append(f"Source {src['id']} has no successful refresh within seven days of as_of.")
         else: src["stale"] = False
     result["summary"] = (f"{len(runs)} recorded source runs; {len(result['unresolved_incomplete_intervals'])} unresolved live or saved intervals. "
-                          "Current APP/ATM feed is missing; disabled and rights-held sources are expected gaps.")
+                          + ("Open-tender feed imported " + atm_at + ". " if atm_at else "Open-tender (ATM) feed not imported. ")
+                          + "Disabled and rights-held sources are expected gaps.")
     root = Path(__file__).resolve().parents[1]
     try:
         manifest = json.loads((root / "config/aic_manifest.json").read_text())
@@ -94,12 +109,13 @@ def build_outputs(repo, profile, taxonomy, policies, as_of, period, audience, ou
     if strict:
         failures = [r for r in coverage["unresolved_incomplete_intervals"] if r["live"]]
         for src in coverage["sources"]:
-            if src["access_mode"] not in {"disabled", "local_only", "manual_reference"} and src["allowed_audiences"] and (src["last_successful_refresh"] is None or src["stale"]):
+            if src["id"] != ATM and src["access_mode"] not in {"disabled", "local_only", "manual_reference"} and src["allowed_audiences"] and (src["last_successful_refresh"] is None or src["stale"]):
                 failures.append(src["id"])
         if failures: raise StrictCoverageError("strict build refused: live source coverage is incomplete or stale")
     payload = prepare_payload(repo, profile, taxonomy, policies, as_of, str(period), audience, include_speculative, coverage)
     files = {
         f"briefing-{period}.md": render_briefing(payload),
+        f"briefing-{period}.html": render_briefing_html(payload),
         "work-packages.json": render_json(payload), "work-packages.csv": render_csv(payload),
         "work-packages.html": render_html(payload),
         f"assessment-{pid}.md": render_assessment_md(payload),

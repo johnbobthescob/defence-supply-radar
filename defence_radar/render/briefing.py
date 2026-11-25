@@ -1,61 +1,99 @@
-"""Compact weekly Markdown briefing."""
-from datetime import datetime
-from zoneinfo import ZoneInfo
-
-from .common import closing_label, eligibility_label, md_text, route_label, source_summaries, status_label
-
-
-def _awst(value):
-    try: return datetime.fromisoformat(value.replace("Z", "+00:00")).astimezone(ZoneInfo("Australia/Perth")).isoformat()
-    except (ValueError, AttributeError): return str(value)
+"""Plain-text-friendly Markdown weekly briefing; mirrors the HTML briefing structure."""
+from .common import (ATM_URL, AUSTENDER_ATTRIBUTION, ICN_URL, WORK_PACKAGES_PAGE, all_reasons, austender_present, awst_date,
+                     awst_stamp, briefing_model, buyer_unit, clean_reason, fit_label, md_inline as t, money, notice_ref,
+                     notice_url, open_gap_text, record_amount, safe_url, signed_stamp, source_refresh_rows, supplier_text,
+                     top_reasons)
 
 
-def _item(row):
-    rec, fit = row["record"], row["match"]
-    lines = [f"### {md_text(rec.get('title', 'Untitled'))}",
-             f"- Status: {md_text(status_label(rec))}. Reason: {md_text(rec.get('classification_reason', ''))}",
-             f"- Eligibility: {md_text(eligibility_label(fit))}",
-             f"- Stage / lifecycle / currentness: {md_text(rec.get('procurement_stage'))} / {md_text(rec.get('lifecycle'))} / {md_text(rec.get('freshness_state'))}. Verified {md_text(rec.get('verified_at') or 'not published')}; source publication {md_text(rec.get('source_published_at') or 'not published')}.",
-             f"- Work location: {md_text('; '.join(p.get('name', '') for p in rec.get('locations', []) if p.get('role') in {'worksite', 'delivery'}) or 'not published')}.",
-             f"- Deadline: {md_text(closing_label(rec))}",
-             f"- Route: {md_text(route_label(rec.get('application_route')))}",
-             f"- Fit: {fit.get('score', 0)}/100; components {md_text(fit.get('components', {}))}; matched {md_text(', '.join(fit.get('matched_capabilities', [])) or 'none')}; missing {md_text(', '.join(fit.get('missing_capabilities', [])) or 'none')}.",
-             f"- Conditions: {md_text('; '.join(rec.get('conditions', [])) or 'None recorded')}"]
-    if fit.get("exclusions"):
-        lines.append("- Constraints: " + md_text("; ".join(fit["exclusions"])))
-    action = {"confirmed_open": "Apply only through the verified official notice; check all requirements.", "published_future_scope": "Prepare capability evidence and verify scope via the published enquiry route.", "speculative": "Watch hypothesis; no buyer commitment or application is established."}.get(rec.get("status_class"), "Use as historical context only; no submission route is established.")
-    lines.append("- Next action: " + action)
-    src = source_summaries(rec)
-    lines.append("- Sources: " + ("; ".join(f"[{md_text(s['source_id'])}]({s['url']}) accessed {md_text(s['accessed_at'])}; pointer {md_text(s['pointer'])}; licence {s['licence_url'] or 'not stated'}" for s in src) if src else "None recorded"))
-    return "\n".join(lines)
+def _link(label, url):
+    u = safe_url(url)
+    return f"[{t(label)}]({u.replace(')', '%29').replace('(', '%28')})" if u else t(label)
+
+
+def _card(row, kind):
+    rec, m = row["record"], row["match"]
+    route = rec.get("application_route") or {}
+    lines = [f"### {t(rec.get('title', 'Untitled'))}",
+             f"**{fit_label(m)}** | Buyer: {t(buyer_unit(rec))}"]
+    if kind == "open":
+        close = awst_stamp(rec.get("close_at_utc")) if rec.get("close_at_utc") else "not published"
+        raw = f" (published as: {t(rec['close_raw'])})" if rec.get("close_raw") else ""
+        lines.append(f"Closes: {t(close)}{raw}")
+    elif kind == "spec":
+        lines.append("Speculative - no buyer commitment.")
+    lines.append("")
+    lines += [f"- {t(clean_reason(r))}" for r in top_reasons(m, 3)]
+    link = route.get("url") or notice_url(rec)
+    if kind == "open":
+        acct = {"yes": "account required", "no": "no account required"}.get(str(route.get("account_required")), "check whether an account is required")
+        lines += ["", f"How to respond: {_link(link, link) if safe_url(link) else t(route.get('email') or 'see notice')} ({acct})."]
+    else:
+        lines += ["", f"Where to enquire: {_link(link, link) if safe_url(link) else 'see source notice'}"]
+    return lines + [""]
 
 
 def render_briefing(payload):
-    rows = payload.get("rows", [])
-    def kind(r): return r["record"].get("record_kind")
-    def status(r): return r["record"].get("status_class")
-    open_rows = [r for r in rows if status(r) == "confirmed_open" and r["match"].get("shortlist")]
-    future = [r for r in rows if status(r) == "published_future_scope" and r["match"].get("score", 0) > 0]
-    speculative = [r for r in rows if status(r) == "speculative"]
-    context = [r for r in rows if kind(r) == "contract_context"]
-    history = [r for r in rows if r["record"].get("lifecycle") in {"closed", "awarded", "cancelled", "superseded"} and kind(r) != "contract_context"]
-    other_context = [r for r in rows if kind(r) in {"registration_context", "readiness_context"}]
-    cov = payload.get("coverage", {})
-    lines = [f"# Defence supply radar — {md_text(payload.get('period', ''))}", "",
-             f"As of **{md_text(_awst(payload.get('as_of', '')))} AWST**.", "",
-             "## Coverage", "",
-             f"{cov.get('confirmed_open', 0)} verified open records; {cov.get('context_records', 0)} relevant contract-context records; {cov.get('held', {}).get('total', 0)} records held; {cov.get('excluded_irrelevant', 0)} unrelated agency records excluded.",
-             "APP/ATM API coverage is missing. AIC-derived distribution remains held pending rights review.",
-             "", "## Confirmed open", ""]
-    health = cov.get("summary") or "See coverage.json for source refresh status, partial windows and access gaps."
-    lines.insert(lines.index("## Confirmed open"), md_text(health))
-    lines.extend([_item(r) for r in open_rows] if open_rows else ["No confirmed-open matches are verified for this build."])
-    for title, subset in (("Published future scope", future), ("Speculative watch", speculative), ("Awarded history — context, not work available", context), ("Inactive history", history), ("Other context", other_context)):
-        lines.extend(["", f"## {title}", ""])
-        lines.extend([_item(r) for r in subset] if subset else ["None."])
-    delta = payload.get("delta", {})
-    lines.extend(["", "## Period changes", "", f"New: {len(delta.get('new', []))}; changed: {len(delta.get('changed', []))}; closed: {len(delta.get('closed', []))}."])
-    for key, label in (("new", "New IDs"), ("changed", "Changed IDs"), ("closed", "Closed IDs")):
-        if delta.get(key): lines.append(f"{label}: {', '.join(md_text(i) for i in delta[key])}.")
-    lines.extend(["", "## Attribution", "", "; ".join(md_text(a) for a in payload.get("attribution", [])) or "No attribution supplied.", ""])
-    return "\n".join(lines)
+    mdl = briefing_model(payload)
+    cov, market, week = mdl["cov"], mdl["market"], mdl["week"]
+    L = ["# Defence Supply Radar — weekly briefing", "",
+         f"**{t((payload.get('profile') or {}).get('name') or 'Your business')}**  ",
+         f"Week {week.get('start', '')} to {week.get('end', payload.get('period', ''))} (AWST)  ",
+         f"Data as of {awst_stamp(payload.get('as_of'))}", "",
+         "## Executive summary", ""] + [f"- {t(b)}" for b in mdl["bullets"]] + ["", "## Open opportunities", ""]
+    if mdl["open"]:
+        for r in mdl["open"]: L += _card(r, "open")
+    else:
+        L += ["**No verified open tenders were imported this week.**", "",
+              t(open_gap_text(cov)) + f" Import the feed from {ATM_URL} to have open tenders scored here. This does not mean nothing is open.", "",
+              "Where to check now:", "", f"- {_link('AusTender Current ATMs', ATM_URL)} (filter: Department of Defence)",
+              f"- {_link('ICN Gateway', ICN_URL)} for Henderson-precinct work packages from primes", ""]
+    L += ["## Upcoming and future scope", ""]
+    if mdl["future"] or mdl["speculative"]:
+        for r in mdl["future"]: L += _card(r, "future")
+        for r in mdl["speculative"]: L += _card(r, "spec")
+    else:
+        L += ["No published future work scope matched your capabilities in this build.", ""]
+    L += ["## Who is winning (awarded contracts — not open opportunities)", "",
+          "**AWARDED** - every item here is a contract that has already been won. Use it to find teaming and subcontract leads, not to bid.", "",
+          f"{market.get('awards_in_week', 0)} relevant awards published this week, {money(market.get('total_value', 0))} total head-contract value. {t(market.get('note', ''))}", ""]
+    sup = (market.get("suppliers") or [])[:8]
+    if sup:
+        L += ["| Supplier | Location | Awards | Value | Example work |", "|---|---|---:|---:|---|"]
+        for s in sup:
+            loc = ", ".join(x for x in (s.get("locality"), s.get("region")) if x) or "n/a"
+            nm = s["name"].title() if s["name"].isupper() else s["name"]
+            L.append(f"| {t(nm)} | {t(loc)} | {s['count']} | {money(s.get('value', 0))} | {t((s.get('titles') or [''])[0])} |")
+        L.append("")
+    if market.get("buyers"):
+        L += ["| Buyer unit | Awards | Value |", "|---|---:|---:|"] + [f"| {t(b['name'])} | {b['count']} | {money(b.get('value', 0))} |" for b in market["buyers"][:6]] + [""]
+    caps = sorted(market.get("capabilities") or [], key=lambda c: (-c.get("count", 0), c.get("label", "")))
+    if caps:
+        L += ["| Capability area | Awards | Value |", "|---|---:|---:|"] + [f"| {t(c['label'])} | {c['count']} | {money(c.get('value', 0))} |" for c in caps] + [""]
+    if mdl["top_awards"]:
+        L += [f"### Top {len(mdl['top_awards'])} awards by fit", ""]
+        for r in mdl["top_awards"]:
+            rec, m = r["record"], r["match"]
+            amt = record_amount(rec)
+            why = "; ".join(clean_reason(x) for x in top_reasons(m, 2))
+            L += [f"- **{t(rec.get('title', 'Untitled'))}** - {_link(notice_ref(rec), notice_url(rec))}, {t(supplier_text(rec))}, {t(buyer_unit(rec))}, "
+                  f"{money(amt) if amt is not None else 'value n/a'}, signed {awst_date(signed_stamp(rec))}, {fit_label(m)}",
+                  f"  Why relevant: {t(why or 'none recorded')}"]
+        L.append("")
+    L += [f"Full list of {len(mdl['awarded_week'])} awarded notices this week: {WORK_PACKAGES_PAGE}", "", "## Recommended actions this week", ""]
+    for i, a in enumerate(mdl["actions"], 1):
+        L.append(f"{i}. {t(a.get('text'))}" + (f" {_link('Link', a['url'])}" if safe_url(a.get("url")) else ""))
+    held = cov.get("held") or {}
+    held_txt = "; ".join(f"{k}: {v}" for k, v in sorted((held.get("by_source") or {}).items())) or "none"
+    L += ["", "## Coverage and data quality", "", f"**Open-tender gap:** {t(open_gap_text(cov))}", "", "Sources (last successful refresh, AWST):", ""]
+    L += [f"- {t(i)} ({t(m)}): {t(s)}" for i, m, s in source_refresh_rows(cov)]
+    L += ["", f"Records held back: {held.get('total', 0)} (by source: {t(held_txt)}).",
+          f"Unrelated records excluded: {cov.get('excluded_irrelevant', 0)}."]
+    if cov.get("warnings"):
+        L += ["", "Warnings:", ""] + [f"- {t(w)}" for w in cov["warnings"]]
+    L += ["", "Scores explain relevance to your declared capabilities; they are not eligibility or approval.", "", "---", ""]
+    attrs = list(payload.get("attribution") or [])
+    if austender_present(payload) and AUSTENDER_ATTRIBUTION not in attrs: attrs.append(AUSTENDER_ATTRIBUTION)
+    L += [t(a) + "  " for a in attrs]
+    rv = payload.get("rule_versions") or {}
+    L += [f"Generated by Henderson Defence Supply-Chain Radar; classification {rv.get('classification', 'n/a')}, matching {rv.get('matching', 'n/a')}, taxonomy v{payload.get('taxonomy_version', 'n/a')}.", ""]
+    return "\n".join(L)

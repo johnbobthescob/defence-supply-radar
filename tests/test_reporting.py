@@ -9,7 +9,7 @@ from defence_radar.models import Opportunity, Profile, SourcePolicy
 from defence_radar.reporting import prepare_payload, record_states
 from defence_radar.render.briefing import render_briefing
 from defence_radar.render.exports import render_csv, render_json
-from defence_radar.render.common import md_text
+from defence_radar.render.common import md_text, md_inline
 
 NOW = "2026-11-23T02:00:00Z"
 TAX = load_taxonomy("config/taxonomy.json")
@@ -81,13 +81,14 @@ def test_csv_formula_cells_are_escaped_but_json_keeps_originals():
 def test_markdown_escapes_html_and_syntax_and_zero_open_context_is_clear():
     assert "&lt;script&gt;" in md_text("<script>")
     assert "\\*" in md_text("*bold*")
+    assert md_inline("<script>*x*") == "\\<script\\>\\*x\\*" and md_inline("a.b-c 1.5") == "a.b-c 1.5"
     context = record("context", record_kind="contract_context", status_class=None, lifecycle="awarded",
                      evidence_flags={"marine_candidate": True})
     payload = prepare_payload(Repo([context]), profile(capabilities=["hydraulics_pneumatics"], activities=[]), TAX, [policy()], NOW, "2026-W47")
     brief = render_briefing(payload)
-    assert "No confirmed-open matches are verified" in brief
-    assert "Awarded history" in brief
-    assert LICENCE in brief
+    assert "No verified open tenders were imported this week" in brief
+    assert "## Open opportunities" in brief and "Synthetic marine hydraulic scope" not in brief.split("## Upcoming")[0]
+    assert "&#x27;" not in brief and "{'" not in brief
 
 
 def test_delta_uses_prior_distinct_period_and_material_state_ignores_retrieval():

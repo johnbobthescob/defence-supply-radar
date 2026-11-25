@@ -20,7 +20,7 @@ def payload(rows): return {'period':'2026-W48','as_of':'2026-11-24T00:00:00Z','r
 
 def test_html_fields_escape_and_offline_controls():
     text=render_html(payload([row('<img src=x onerror=alert(1)> </script>')]))
-    for term in ('Official notice','Lifecycle:','fresh','hydraulics','Geography:','Eligibility:','Safety plan','AWST','account required','licence','Search','Active only','Show context','Clear filters','aria-live'):
+    for term in ('Official notice','Lifecycle:','fresh','hydraulics','Geography:','Eligibility:','Safety plan','AWST','account required','licence','Search','Clear filters','aria-live','Fit 75/100 (strong)','Class','Minimum score','Agency / buyer unit','Capability / category'):
         assert term in text
     assert '&lt;img' in text and '&lt;/script&gt;' in text
     assert '<img src=x' not in text and '<script src=' not in text and 'PRIVATE_SENTINEL' not in text
@@ -29,10 +29,11 @@ def test_html_fields_escape_and_offline_controls():
     assert 'https://example.org/apply' in text
 
 
-def test_html_default_filter_logic_and_safe_url():
-    text=render_html(payload([row(),row('Awarded',None,'awarded',False,0,'contract_context'),row('Hypothesis','speculative','planned',False,40)]))
-    assert "els.view.value==='active'" in text and "c.dataset.context==='false'&&isActive" in text
-    assert 'Show context, inactive and speculative records' in text
+def test_html_default_shows_all_rows_with_unmistakable_awarded_badge_and_safe_url():
+    text=render_html(payload([row(),row('Awarded','awarded_context','awarded',False,0,'contract_context'),row('Hypothesis','speculative','planned',False,40)]))
+    assert text.count('<article class="card')==3
+    assert 'AWARDED \u2014 not an opportunity' in text and 'data-cls="confirmed_open"' in text
+    assert '<noscript>' in text and 'id="controls"' in text and 'hidden' in text
     # Unsafe links are rendered as text, never as navigable hrefs.
     bad=row('bad'); bad['record']['application_route']['url']='javascript:alert(1)'
     assert 'href="javascript:' not in render_html(payload([bad]))

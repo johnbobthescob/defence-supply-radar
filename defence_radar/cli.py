@@ -46,6 +46,7 @@ def build_parser():
         c.add_argument("--offline", action="store_true")
         if strict: c.add_argument("--strict", action="store_true")
         if speculative: c.add_argument("--include-speculative", action="store_true")
+        if output: c.add_argument("--pdf", action="store_true", help="also render briefing PDF via local headless Chrome (not hashed in manifest)")
     c = sub.add_parser("init"); common(c); c.add_argument("--directory", default=".")
     src = sub.add_parser("sources"); ss = src.add_subparsers(dest="sources_command", required=True); c=ss.add_parser("check"); c.add_argument("--offline", action="store_true"); c.add_argument("--path", default="config/sources.json")
     pr = sub.add_parser("profile"); ps=pr.add_subparsers(dest="profile_command", required=True); c=ps.add_parser("validate"); c.add_argument("path"); c.add_argument("--taxonomy", default="config/taxonomy.json")
@@ -101,7 +102,12 @@ def _build(args, repo, at):
     if out.is_relative_to(ROOT / "out/sample") and (args.audience != "public" or not profile.fictional):
         raise ValueError("out/sample requires a public build with a fictional profile")
     for p in policies: repo.save_policy(p, at)
-    return build_outputs(repo, profile, taxonomy, policies, at, period, args.audience, out, args.include_speculative, args.strict)
+    manifest = build_outputs(repo, profile, taxonomy, policies, at, period, args.audience, out, args.include_speculative, args.strict)
+    if getattr(args, "pdf", False):
+        from .render.pdf import html_to_pdf
+        ok = html_to_pdf(out / f"briefing-{period}.html", out / f"briefing-{period}.pdf")
+        print(f"PDF {'written' if ok else 'skipped (no headless Chrome/Chromium found)'}: {out / f'briefing-{period}.pdf'}", file=sys.stderr)
+    return manifest
 
 def main(argv=None):
     args=build_parser().parse_args(argv)
