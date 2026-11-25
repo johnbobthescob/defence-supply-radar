@@ -1,0 +1,56 @@
+{
+  "as_of": "2026-11-25T01:30:00Z",
+  "audience": "public",
+  "excluded_counts": {
+    "irrelevant": 374
+  },
+  "held_count": 4,
+  "input_snapshot_sha256": [
+    "45c08c0e6bbd8b92569e1c1db187000b7bc58ff6f3e399050e53bb1fb96773c4",
+    "4f09b0e6cb866afeeb5ad05414d735202ddd3f30900fe0f65365abd8d77036a2",
+    "5b06a1524c1f8e34eab1c9bad80e32e66bb3b0333b90c9d5152cefef5dc44821",
+    "70abbae2f3929298b5435718c4bc613b62381dd33cfe055f5be286583ff55934",
+    "7ba278eb8a2b73e237314dc7b4470e31e1c4eaf002ae79f089b5ec7e83ab7251",
+    "80adfff153d6da7a13d79f3b1f764074864bab7c10ff65e37798f3fe90bde61a",
+    "9fdac8fd5cfcc13549dea8999a4e766fa58b869b7e3365d4385c7c3b0f6d039c",
+    "b2637cd299816030b95c563bcedf709b6238e23732e19d9583313156f3f54e2d",
+    "b99e7a54e7ea5b9440c83ae4a5229322417f0911601a7611e3a905bf489ca504",
+    "f2cdb7ea4094b6f900a986be3ceea20db90c978119f810823cb6ae5a48b15a71",
+    "f91fb4c0bf6f47128f234a34409ae5bb96978020c7064a4b80dfede55d4d8463",
+    "f9c217213ee2c26c88c5682f15e8e8ed4726a77e7b9a3dd745aa1d70df8c5f78"
+  ],
+  "inventory_hashes": {
+    "aic_manifest": "401613146d029cef218ef304f5626a6f05d9a34355de9fba32c73aac95a86ee9",
+    "official_seeds": "70e23d66ef04708acc3819349fdb39cc85279cb934c8710e04903b52e38eb34c"
+  },
+  "output_sha256": {
+    "assessment-fictional-henderson-marine-sme.html": "78d4f5c7050859345aa0266a207e57287353dd6d2234a55b487fb39dcdf71589",
+    "assessment-fictional-henderson-marine-sme.md": "a57e93183ced8c925a91278a9737c98c770f31b81e4e3c515bf473c3440cede3",
+    "briefing-2026-11-22.html": "91fcd525365b6cd16cada30a4f633c57c6f0ba5e32b2623342899ed0a3004056",
+    "briefing-2026-11-22.md": "d28adcd0067f583665db5f5b941da25d60a410e83fcb40a174e6b91236c288d7",
+    "coverage.json": "3e71c6494cdb53f0a697c4db21c106267b22d183e1e78e532bf4a36fd3123661",
+    "work-packages.csv": "4f875e3a163b20e36e39ed62cb17792ed91ddbd10a607b82cc7b68fffe3fef23",
+    "work-packages.html": "ef8f9d2b416d75968b71045502dfafc263f22ed957ea60fb1c3f81b1bece40cb",
+    "work-packages.json": "d1add71d43651f1fc8915f38f4e778df58f0f015423910c6a29a46d793848d41"
+  },
+  "period": "2026-11-22",
+  "policy_hashes": {
+    "aic": "01af5df54caba79c71fcb7ef934fe509fdfe417dadcd0a8b74ba3b571be663b8",
+    "asa": "3a95cfd40d8adb14e966e13b1fea2d46db4e82e8c6cf1d9decd5eff572f6e693",
+    "austender": "9ea641828d0e05461a35dfb71f1745b7297429667e11dff781c907c12729de4e",
+    "austender_atm": "52d2db6da52186a079c71d42636af647af81df111a97fb71a040b9f51a06fe1d",
+    "directory": "4a76403a7caa4373f387cd864c092f514ac947d7836ea650bc2d07945beba9a8",
+    "icn": "a19f811ee95cc3a6d8dfadc3ecc314bbe5660397cc86fe7ba729292ed103188e",
+    "official_manual": "9fc734ba0701e50a8c707bae5a355dd37c04973f610c4c6894fc2b9bef4af5ab",
+    "wa": "f6cdd1b644adf31b0dec40b4e0b253af5ff37896059fd7f1553a97731cad9114"
+  },
+  "profile_hash": "e6788c5c62c90e3dde71beacdc2d051a8b823fb337bd7a88f9ccce1318db378f",
+  "profile_id": "fictional-henderson-marine-sme",
+  "rule_versions": {
+    "classification": "status-2",
+    "matching": "match-2"
+  },
+  "schema_version": 1,
+  "taxonomy_hash": "82f7798ccf04575b8187020e1be11cac6eaf657f1a1a7792e9159461db2e6fff",
+  "taxonomy_version": 2
+}

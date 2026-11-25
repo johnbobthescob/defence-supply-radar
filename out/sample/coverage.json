@@ -1,0 +1,225 @@
+{
+  "aic_candidate_count": 4,
+  "aic_document_count": 4,
+  "confirmed_open": 0,
+  "context_records": 89,
+  "disabled_seed_candidates": 7,
+  "excluded_irrelevant": 374,
+  "held": {
+    "by_source": {
+      "aic": 4
+    },
+    "total": 4
+  },
+  "inventory_hashes": {
+    "aic_manifest": "401613146d029cef218ef304f5626a6f05d9a34355de9fba32c73aac95a86ee9",
+    "official_seeds": "70e23d66ef04708acc3819349fdb39cc85279cb934c8710e04903b52e38eb34c"
+  },
+  "missing_aic_documents": 0,
+  "open_tender_feed": {
+    "fresh": false,
+    "last_import": null,
+    "source": "austender_atm"
+  },
+  "review_held": 4,
+  "runs": [
+    {
+      "at": "2026-11-25T01:27:04.133535Z",
+      "end": "2026-11-25T01:27:04.133535Z",
+      "field": "feed",
+      "live": 1,
+      "pages": 0,
+      "records": 0,
+      "source_id": "austender_atm",
+      "start": "2026-11-25T01:27:04.133535Z",
+      "state": "failed"
+    },
+    {
+      "at": "2026-11-25T01:27:05.166415Z",
+      "end": "2026-11-16T16:00:00Z",
+      "field": "contractPublished",
+      "live": 1,
+      "pages": 6,
+      "records": 498,
+      "source_id": "austender",
+      "start": "2026-11-15T16:00:00Z",
+      "state": "complete"
+    },
+    {
+      "at": "2026-11-25T01:27:05.166415Z",
+      "end": "2026-11-17T16:00:00Z",
+      "field": "contractPublished",
+      "live": 1,
+      "pages": 1,
+      "records": 83,
+      "source_id": "austender",
+      "start": "2026-11-16T16:00:00Z",
+      "state": "complete"
+    },
+    {
+      "at": "2026-11-25T01:27:05.166415Z",
+      "end": "2026-11-18T16:00:00Z",
+      "field": "contractPublished",
+      "live": 1,
+      "pages": 3,
+      "records": 121,
+      "source_id": "austender",
+      "start": "2026-11-17T16:00:00Z",
+      "state": "complete"
+    },
+    {
+      "at": "2026-11-25T01:27:05.166415Z",
+      "end": "2026-11-19T16:00:00Z",
+      "field": "contractPublished",
+      "live": 1,
+      "pages": 4,
+      "records": 202,
+      "source_id": "austender",
+      "start": "2026-11-18T16:00:00Z",
+      "state": "complete"
+    },
+    {
+      "at": "2026-11-25T01:27:05.166415Z",
+      "end": "2026-11-20T16:00:00Z",
+      "field": "contractPublished",
+      "live": 1,
+      "pages": 3,
+      "records": 120,
+      "source_id": "austender",
+      "start": "2026-11-19T16:00:00Z",
+      "state": "complete"
+    },
+    {
+      "at": "2026-11-25T01:27:05.166415Z",
+      "end": "2026-11-21T16:00:00Z",
+      "field": "contractPublished",
+      "live": 1,
+      "pages": 1,
+      "records": 0,
+      "source_id": "austender",
+      "start": "2026-11-20T16:00:00Z",
+      "state": "complete"
+    },
+    {
+      "at": "2026-11-25T01:27:05.166415Z",
+      "end": "2026-11-22T16:00:00Z",
+      "field": "contractPublished",
+      "live": 1,
+      "pages": 1,
+      "records": 0,
+      "source_id": "austender",
+      "start": "2026-11-21T16:00:00Z",
+      "state": "complete"
+    }
+  ],
+  "sources": [
+    {
+      "access_mode": "api",
+      "allowed_audiences": [
+        "research",
+        "public"
+      ],
+      "id": "austender",
+      "last_successful_refresh": "2026-11-25T01:27:05.166415Z",
+      "latest_run": {
+        "at": "2026-11-25T01:27:05.166415Z",
+        "end": "2026-11-22T16:00:00Z",
+        "field": "contractPublished",
+        "live": 1,
+        "pages": 1,
+        "records": 0,
+        "source_id": "austender",
+        "start": "2026-11-21T16:00:00Z",
+        "state": "complete"
+      },
+      "rights_status": "licensed",
+      "stale": false
+    },
+    {
+      "access_mode": "local_only",
+      "allowed_audiences": [],
+      "id": "aic",
+      "last_successful_refresh": null,
+      "latest_run": null,
+      "rights_status": "restricted",
+      "stale": false
+    },
+    {
+      "access_mode": "manual_reference",
+      "allowed_audiences": [],
+      "id": "asa",
+      "last_successful_refresh": null,
+      "latest_run": null,
+      "rights_status": "unverified",
+      "stale": false
+    },
+    {
+      "access_mode": "manual_reference",
+      "allowed_audiences": [],
+      "id": "official_manual",
+      "last_successful_refresh": null,
+      "latest_run": null,
+      "rights_status": "unverified",
+      "stale": false
+    },
+    {
+      "access_mode": "disabled",
+      "allowed_audiences": [],
+      "id": "wa",
+      "last_successful_refresh": null,
+      "latest_run": null,
+      "rights_status": "restricted",
+      "stale": false
+    },
+    {
+      "access_mode": "disabled",
+      "allowed_audiences": [],
+      "id": "icn",
+      "last_successful_refresh": null,
+      "latest_run": null,
+      "rights_status": "unverified",
+      "stale": false
+    },
+    {
+      "access_mode": "disabled",
+      "allowed_audiences": [],
+      "id": "directory",
+      "last_successful_refresh": null,
+      "latest_run": null,
+      "rights_status": "restricted",
+      "stale": false
+    },
+    {
+      "access_mode": "api",
+      "allowed_audiences": [
+        "research",
+        "public"
+      ],
+      "id": "austender_atm",
+      "last_successful_refresh": null,
+      "latest_run": {
+        "at": "2026-11-25T01:27:04.133535Z",
+        "end": "2026-11-25T01:27:04.133535Z",
+        "field": "feed",
+        "live": 1,
+        "pages": 0,
+        "records": 0,
+        "source_id": "austender_atm",
+        "start": "2026-11-25T01:27:04.133535Z",
+        "state": "failed"
+      },
+      "rights_status": "licensed",
+      "stale": false
+    }
+  ],
+  "summary": "8 recorded source runs; 0 unresolved live or saved intervals. Open-tender (ATM) feed not imported. Disabled and rights-held sources are expected gaps.",
+  "unresolved_incomplete_intervals": [],
+  "warnings": [
+    "AusTender current-ATM feed has not been imported, so open tenders are not covered this build. Save the feed and import it with the ingest atm-rss command (see docs/OPEN-TENDER-SOURCE.md).",
+    "Annual procurement plans (APPs) and prime-contractor work packages (e.g. ICN Gateway) are not ingested.",
+    "AIC-derived content remains rights-held for public distribution.",
+    "Source wa is disabled by policy.",
+    "Source icn is disabled by policy.",
+    "Source directory is disabled by policy."
+  ]
+}
