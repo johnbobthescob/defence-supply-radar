@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<!-- SYNTHETIC malicious test data: entity declaration must be rejected. -->
+<!DOCTYPE rss [<!ENTITY lol "lol"><!ENTITY lol2 "&lol;&lol;&lol;&lol;">]>
+<rss version="2.0"><channel><title>x</title>
+<item><title>&lol2;</title><link>https://www.tenders.gov.au/atm/show/x</link></item>
+</channel></rss>

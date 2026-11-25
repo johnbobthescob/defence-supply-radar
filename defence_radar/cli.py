@@ -11,6 +11,7 @@ from .evidence import digest
 from .http_client import HttpClient
 from .ingest.austender import fetch, incremental_start, replay_saved
 from .ingest.aic import ingest_aic
+from .ingest.atm_rss import import_feed, fetch_feed
 from .ingest.seeds import ingest_seeds
 from .models import utc_datetime, utc_iso
 from .pipeline import build_outputs, StrictCoverageError, _coverage
@@ -58,6 +59,7 @@ def build_parser():
     c=ins.add_parser("austender"); common(c); c.add_argument("--field", choices=("contractPublished", "contractLastModified"), default=None); c.add_argument("--start"); c.add_argument("--end"); c.add_argument("--incremental", action="store_true"); c.add_argument("--saved-dir"); c.add_argument("--max-pages", type=int, default=100)
     c=ins.add_parser("aic"); common(c); c.add_argument("--manifest", default="config/aic_manifest.json"); c.add_argument("--root", default="."); c.add_argument("--extract-pdf", action="store_true")
     c=ins.add_parser("seeds"); common(c); c.add_argument("--file", default="config/official_seeds.json")
+    c=ins.add_parser("atm-rss"); common(c); g=c.add_mutually_exclusive_group(required=True); g.add_argument("--file"); g.add_argument("--fetch", action="store_true"); c.add_argument("--accessed-at", type=_aware)
     c=sub.add_parser("inspect"); c.add_argument("id"); common(c, profile=True)
     c=sub.add_parser("audit"); common(c)
     return p
@@ -128,6 +130,15 @@ def main(argv=None):
                     if partial: return 3
                     _build(args,repo,at if args.as_of else _clock(args)); return 0
                 print(json.dumps(runs,sort_keys=True)); return 3 if partial else 0
+            if args.command=="ingest" and args.ingest_command=="atm-rss":
+                if args.fetch and args.offline: print("--offline prohibits --fetch"); return 2
+                if args.fetch and args.accessed_at: print("--accessed-at applies only to --file"); return 2
+                policies=load_sources(_project("config/sources.json"))
+                for p in policies: repo.save_policy(p,at)
+                if args.fetch:
+                    policy=next(p for p in policies if p.id=="austender_atm")
+                    result=fetch_feed(repo,HttpClient(policy),_project("data/raw"),at); print(json.dumps(result,sort_keys=True)); return 0 if result["state"]=="complete" else 3
+                result=import_feed(repo,_project(args.file),_project("data/raw"),args.accessed_at); print(json.dumps(result,sort_keys=True)); return 0
             if args.command=="ingest":
                 if args.ingest_command=="aic": result=ingest_aic(repo,_project(args.manifest),_project(args.root),args.extract_pdf)
                 else: result=ingest_seeds(repo,_project(args.file))

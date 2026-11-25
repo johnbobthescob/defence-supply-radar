@@ -42,6 +42,30 @@ def _age(value, now):
     return now - utc_datetime(value) if value else None
 
 
+ATM_FRESH = timedelta(hours=48)
+
+
+def _atm(result, now, age, evidence_ids, decide):
+    """AusTender current-ATM feed (CC BY 3.0 AU). Being in a fresh copy of Finance's feed of approaches to
+    market *currently open* is official evidence of open status; the ATM page remains the authority."""
+    route = result.application_route
+    if age is None or age < timedelta(0):
+        return decide("ATM_UNVERIFIED", "ATM feed retrieval time is missing or after this build; re-import the current feed.", held=True)
+    if age > ATM_FRESH:
+        result.freshness_state = "stale"
+        return decide("ATM_STALE", f"Listed on the AusTender current-ATM feed, but that copy is {age.days} day(s) old; re-import today's feed before relying on it.", held=True)
+    if result.verification_error:
+        return decide("VERIFICATION_FAILED", "Latest ATM feed retrieval failed; prior listing not renewed.", held=True)
+    if not set(result.classification_evidence) & evidence_ids or not route.get("url") or route.get("evidence_id") not in evidence_ids:
+        return decide("ATM_REVIEW", "ATM listing lacks an official notice link or evidence reference.", held=True)
+    if result.close_at_utc:
+        closes = "closes " + utc_datetime(result.close_at_utc).astimezone(ZoneInfo("Australia/Perth")).strftime("%a %d %b %Y %H:%M AWST")
+    else:
+        closes = "closing time not stated in the feed; check the ATM page"
+    return decide("ATM_LISTED", f"Listed on AusTender's official current-ATM feed (retrieved within 48 hours); {closes}. "
+                  "Download the documents and lodge only via the ATM page.", "confirmed_open", "open")
+
+
 def classify(record, as_of):
     result = Opportunity.from_dict(deepcopy(record.to_dict()))
     now = utc_datetime(as_of)
@@ -81,6 +105,8 @@ def classify(record, as_of):
     if result.close_at_utc and now >= utc_datetime(result.close_at_utc):
         return decide("DEADLINE_PASSED", "The exact submission deadline has passed; no award is inferred.", "inactive", lifecycle="closed")
     evidence_ids = {s["evidence_id"] for s in result.sources}
+    if "austender_atm" in result.source_ids and result.record_kind == RecordKind.procurement:
+        return _atm(result, now, age, evidence_ids, decide)
     if result.review_state != ReviewState.reviewed or not result.classification_evidence or not set(result.classification_evidence) <= evidence_ids:
         return decide("REVIEW", "Status evidence is absent, unreviewed or lacks a valid source reference.", held=True)
     if age is None or age < timedelta(0):
