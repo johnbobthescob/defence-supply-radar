@@ -65,7 +65,7 @@ def _coverage(repo, policies, as_of):
     if not atm:
         result["warnings"].append("Open-tender source (AusTender current-ATM feed) is not configured; open opportunities are not covered.")
     elif not atm_at:
-        result["warnings"].append("AusTender current-ATM feed has not been imported, so open tenders are not covered this build. Save the feed and run `ingest atm-rss --file` (docs/OPEN-TENDER-SOURCE.md).")
+        result["warnings"].append("AusTender current-ATM feed has not been imported, so open tenders are not covered this build. Save the feed and import it with the ingest atm-rss command (see docs/OPEN-TENDER-SOURCE.md).")
     elif utc_datetime(as_of) - utc_datetime(atm_at) > timedelta(hours=48):
         result["warnings"].append(f"AusTender current-ATM feed was last imported {atm_at}; listings older than 48 hours are held. Re-import today's feed.")
     result["open_tender_feed"] = {"source": ATM, "last_import": atm_at, "fresh": bool(atm_at) and utc_datetime(as_of) - utc_datetime(atm_at) <= timedelta(hours=48)}

@@ -60,7 +60,10 @@ def market_summary(rows, week, taxonomy):
     for e in suppliers.values(): e["value"] = round(e["value"], 2); e["titles"] = e["titles"][:4]; e["notice_ids"] = sorted(set(e["notice_ids"]))[:6]
     for d in (buyers, caps):
         for e in d.values(): e["value"] = round(e["value"], 2)
-    return {"window": week, "awards_in_week": len(in_week), "relevant_awards_total": len(awards),
+    biggest = max(scope, key=lambda r: _amount(r["record"]) or 0.0, default=None)
+    largest = ({"title": biggest["record"].get("title"), "supplier": (biggest["record"].get("prime") or "").title(),
+                "value": _amount(biggest["record"]) or 0.0, "notice_id": biggest["record"].get("source_record_id")} if biggest else None)
+    return {"window": week, "awards_in_week": len(in_week), "largest": largest, "relevant_awards_total": len(awards),
             "total_value": round(sum(_amount(r["record"]) or 0.0 for r in scope), 2), "currency": "AUD",
             "suppliers": sorted(suppliers.values(), key=lambda x: (-x["count"], -x["best_score"], -x["value"], x["name"])), "buyers": sorted(buyers.values(), key=lambda x: (-x["count"], -x["value"], x["name"])), "capabilities": order(caps),
             "wa_suppliers": [e for e in order(suppliers) if e["region"] == "WA"],
@@ -78,15 +81,17 @@ def recommended_actions(rows, market, taxonomy):
     open_rows = [r for r in rows if r["record"].get("status_class") == "confirmed_open" and r["match"].get("score", 0) >= 25]
     for r in sorted(open_rows, key=lambda x: (x["record"].get("close_at_utc") or "9999", -x["match"]["score"]))[:3]:
         rec = r["record"]; route = rec.get("application_route") or {}
-        actions.append({"priority": 1, "kind": "bid", "text": f"Decide bid/no-bid on '{rec.get('title')}' (fit {r['match']['score']}/100) before it closes; "
+        actions.append({"priority": 1, "kind": "bid", "text": f"Decide bid/no-bid on “{rec.get('title')}” (fit {r['match']['score']}/100) before it closes; "
                         "read the full ATM documents and conditions on AusTender first.", "url": route.get("url") or (rec.get("sources") or [{}])[0].get("url")})
     future = [r for r in rows if r["record"].get("status_class") == "published_future_scope" and r["match"].get("score", 0) >= 45]
     for r in sorted(future, key=lambda x: -x["match"]["score"])[:2]:
         rec = r["record"]
-        actions.append({"priority": 2, "kind": "prepare", "text": f"Prepare a capability statement for the published future scope '{rec.get('title')}' and contact the listed enquiry route.",
+        actions.append({"priority": 2, "kind": "prepare", "text": f"Prepare a capability statement for the published future scope “{rec.get('title')}” and contact the listed enquiry route.",
                         "url": (rec.get("application_route") or {}).get("url") or (rec.get("sources") or [{}])[0].get("url")})
+    def _wa(r): return any(s.get("region") == "WA" for s in r["record"].get("evidence_flags", {}).get("suppliers", []) or [])
+    # WA-based winners first: the most practical teaming/subcontract leads for a Henderson SME.
     awards = sorted((r for r in rows if r["record"].get("status_class") == "awarded_context" and r["match"].get("score", 0) >= 45),
-                    key=lambda x: (-x["match"]["score"], -(_amount(x["record"]) or 0)))
+                    key=lambda x: (not _wa(x), -x["match"]["score"], -(_amount(x["record"]) or 0)))
     seen = set()
     for r in awards:
         rec = r["record"]; who = rec.get("prime") or ""
@@ -97,7 +102,7 @@ def recommended_actions(rows, market, taxonomy):
         amount = _amount(rec)
         caps = ", ".join(taxonomy["categories"].get(k, {}).get("label", k) for k in r["match"].get("matched_capabilities", [])) or "marine work"
         actions.append({"priority": 3, "kind": "teaming", "text": f"Approach {who.title()}{' (' + where + ')' if where else ''} as a potential subcontract or teaming partner: "
-                        f"they won '{rec.get('title')}' ({rec.get('source_record_id')}{', ' + _money(amount) if amount else ''}) in {caps}.",
+                        f"they won “{rec.get('title')}” ({rec.get('source_record_id')}{', ' + _money(amount) if amount else ''}) in {caps}.",
                         "url": (rec.get("sources") or [{}])[0].get("url")})
         if len(seen) >= 3: break
     if market.get("buyers"):

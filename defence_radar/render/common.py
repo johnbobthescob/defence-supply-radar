@@ -267,7 +267,9 @@ def briefing_model(payload):
     else:
         bullets.append("No verified open tenders this week. The open-tender feed is imported manually, so check AusTender and ICN Gateway yourself (see Open opportunities).")
     if n_awards:
-        bullets.append(f"{n_awards} relevant awarded contract{'s' if n_awards != 1 else ''} published this week, worth {money(total)} in total. These are awarded context, not open work.")
+        big = market.get("largest") or {}
+        share = f" The largest, {big['title']} won by {big['supplier']} ({money(big['value'])}), is {round(100 * big['value'] / total)}% of that." if big.get("value") and total and big["value"] / total >= 0.25 else ""
+        bullets.append(f"{n_awards} relevant awarded contract{'s' if n_awards != 1 else ''} published this week, worth {money(total)} in total.{share} These are awarded context, not open work.")
     else:
         bullets.append("No relevant awarded contracts were published this week.")
     if caps:

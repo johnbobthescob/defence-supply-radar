@@ -126,7 +126,7 @@ def match(record, profile, taxonomy, as_of):
         hits = []
         for tag in record.capabilities:
             if tag.get("id") == key and tag.get("evidence_id") in evidence_ids and tag.get("span"):
-                hits.append((35 if tag.get("role") == "core" else 20, f"reviewed scope phrase '{tag['span']}'", "scope"))
+                hits.append((35 if tag.get("role") == "core" else 20, f"scope phrase '{tag['span']}'", "scope"))
         if not existing_supplier:
             terms = {a: 35 for a in cat["aliases"]}
             for term, pts in cat.get("keywords", {}).items():
@@ -226,7 +226,7 @@ def match(record, profile, taxonomy, as_of):
         multi = any(len(normal(t.get("span", "")).split()) >= 2 for t in record.capabilities if t.get("id") in intersection)
         strong = any(found[k][0] >= 30 for k in intersection)
         if flags.get("specific_scope") is True or multi:
-            comp["specificity"] = 10; reasons.append("+10 specific, reviewed scope")
+            comp["specificity"] = 10; reasons.append("+10 specific scope phrase")
         elif strong:
             comp["specificity"] = 5; reasons.append("+5 capability is named specifically")
 
@@ -246,8 +246,8 @@ def match(record, profile, taxonomy, as_of):
         reasons.append("No capability or maritime evidence; geography alone cannot create a match")
     if comp["capability"] and not comp["domain"]:
         plat = OTHER_PLATFORM.search(record.title + " " + record.summary + " " + branch)
-        if plat and score > 30:
-            reasons.append(f"capped at 30: non-maritime platform ('{plat[0]}')"); score = 30
+        if plat and score > 20:
+            reasons.append(f"capped at 20: non-maritime platform ('{plat[0]}')"); score = 20
         elif score > 50:
             reasons.append("capped at 50: no maritime context in the notice (could be land or air work)"); score = 50
     off = next(((c, OFF_PROFILE[c[:4]] if c[:4] in OFF_PROFILE else OFF_PROFILE[c[:2]]) for c in codes if c[:4] in OFF_PROFILE or c[:2] in OFF_PROFILE), None)
