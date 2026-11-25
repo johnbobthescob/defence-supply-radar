@@ -7,7 +7,7 @@ import re
 import sqlite3
 
 from .evidence import canonical_json, digest
-from .models import Opportunity, SourcePolicy, utc_iso
+from .models import Opportunity, SourcePolicy, utc_iso, utc_datetime
 
 
 def _time(value):
@@ -17,6 +17,12 @@ def _time(value):
     if value is None: return datetime.now(timezone.utc).isoformat()
     try: return utc_iso(value)
     except ValueError: return str(value)
+
+
+def _event_order(value):
+    """Compare true instants, including equivalent offsets and fractional seconds."""
+    try: return utc_datetime(value).timestamp()
+    except (ValueError, TypeError): return float("-inf")
 
 
 def material_state(record):
@@ -116,13 +122,14 @@ class Repository:
         raw = canonical_json(record.to_dict())
         self.connection.execute("INSERT OR IGNORE INTO records(id) VALUES(?)", (record.id,))
         versions = self.connection.execute("SELECT hash,event_at,payload FROM record_versions WHERE id=?", (record.id,)).fetchall()
-        equal = [r for r in versions if r["event_at"] == event and material_state(json.loads(r["payload"])) != material_state(record)]
+        equal = [r for r in versions if _event_order(r["event_at"]) == _event_order(event) and material_state(json.loads(r["payload"])) != material_state(record)]
         self.connection.execute("INSERT OR IGNORE INTO record_versions(id,hash,payload,event_at,needs_review) VALUES(?,?,?,?,?)",
                                 (record.id,h,raw,event,int(bool(equal))))
         if equal:
-            self.connection.execute("UPDATE record_versions SET needs_review=1 WHERE id=? AND event_at=?", (record.id,event))
+            for version in equal:
+                self.connection.execute("UPDATE record_versions SET needs_review=1 WHERE id=? AND hash=?", (record.id,version["hash"]))
         current = self.connection.execute("SELECT current_hash,current_event FROM records WHERE id=?", (record.id,)).fetchone()
-        if current["current_hash"] is None or event > (current["current_event"] or "") or (event == current["current_event"] and not equal):
+        if current["current_hash"] is None or _event_order(event) > _event_order(current["current_event"]) or (_event_order(event) == _event_order(current["current_event"]) and not equal):
             self.connection.execute("UPDATE records SET current_hash=?,current_event=? WHERE id=?", (h,event,record.id))
         return h
 

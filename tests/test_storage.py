@@ -83,3 +83,12 @@ def test_same_release_changed_payload_holds_normalized_record(tmp_path):
         repo.complete_window("s1", "field", "a", "b", [], [rel], [rec], "2026-01-03T00:00:00Z")
         assert repo.get_record(rec.id).evidence_flags["conflicting_versions"]
         assert repo.get_record(rec.id).review_state.value == "needs_review"
+
+
+def test_fractional_event_order_and_equivalent_timezone_conflicts(tmp_path):
+    with Repository(tmp_path/"db") as repo:
+        repo.save_record(record(title="earlier"), "2026-01-01T00:00:00Z")
+        repo.save_record(record(title="later"), "2026-01-01T00:00:00.500Z")
+        assert repo.get_record("opp-1").title == "later"
+        repo.save_record(record(title="conflict"), "2026-01-01T08:00:00.500+08:00")
+        assert repo.get_record("opp-1").review_state.value == "needs_review"

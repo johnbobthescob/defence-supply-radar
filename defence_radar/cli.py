@@ -4,6 +4,7 @@ from datetime import date, datetime, timedelta, timezone
 import json
 from pathlib import Path
 import sys
+from zoneinfo import ZoneInfo
 
 from .config import load_profile, load_sources, load_taxonomy
 from .evidence import digest
@@ -62,11 +63,11 @@ def build_parser():
     return p
 
 def _clock(args):
-    now = args.as_of or utc_iso(datetime.now(timezone.utc).replace(microsecond=0))
+    now = args.as_of or utc_iso(datetime.now(timezone.utc))
     return now
 
 def _range(args, repo):
-    end = utc_iso(args.end) if args.end else _clock(args)
+    end = utc_iso(args.end) if args.end else utc_iso(utc_datetime(_clock(args)).replace(microsecond=0))
     if args.incremental: start = incremental_start(repo, args.field, args.start)
     elif args.start: start = utc_iso(args.start)
     else: start = utc_iso(utc_datetime(end) - timedelta(days=30))
@@ -92,7 +93,7 @@ def _refresh(repo, args, policies, at):
 
 def _build(args, repo, at):
     policies=load_sources(_project("config/sources.json")); taxonomy=load_taxonomy(_project("config/taxonomy.json")); profile=load_profile(_project(args.profile), _project("config/taxonomy.json"))
-    period=args.week_ending or at[:10]
+    period=args.week_ending or utc_datetime(at).astimezone(ZoneInfo("Australia/Perth")).date().isoformat()
     date.fromisoformat(period)
     out=_project(args.out or f"out/{args.audience}/{profile.id}/{period}", output=True)
     if out.is_relative_to(ROOT / "out/sample") and (args.audience != "public" or not profile.fictional):
