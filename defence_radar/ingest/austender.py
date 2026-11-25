@@ -7,6 +7,7 @@ import re
 from urllib.parse import urlsplit, parse_qsl
 
 from ..evidence import save_snapshot
+from ..http_client import NoRecordsError
 from ..models import Opportunity, utc_datetime, utc_iso
 from ..policy import validate_fetch_url
 
@@ -137,7 +138,16 @@ def fetch_window(repo, client, raw_root, field, start, end, at, *, max_pages=100
             if len(seen) >= max_pages:
                 raise ValueError("Page cap reached before terminal page")
             seen.add(_url_key(url))
-            response = client.get(url, expected_path=expected_path)
+            try:
+                response = client.get(url, expected_path=expected_path)
+            except NoRecordsError as empty:
+                if snapshots:
+                    raise ValueError("Empty-window answer after the first page") from empty
+                # Weekends/holidays: the API reports an empty window as HTTP 400 errorCode 100.
+                snapshot = save_snapshot(raw_root, "austender", url, empty.response.body, utc_iso(client.clock()),
+                                         status=400, headers=empty.response.headers, final_url=empty.response.url)
+                repo.add_snapshot(snapshot)
+                return repo.complete_window("austender", field, start, end, [snapshot], [], [], at, live=True)
             snapshot = save_snapshot(raw_root, "austender", url, response.body, utc_iso(client.clock()),
                                      headers=response.headers, final_url=response.url)
             snapshots.append(snapshot)

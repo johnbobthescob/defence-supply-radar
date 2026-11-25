@@ -108,3 +108,19 @@ def test_retry_and_redirect_boundaries():
 @pytest.mark.parametrize("body", [b"oops", b"{}", b'{"releases":{}}'])
 def test_invalid_package(body):
     with pytest.raises(ValueError): parse_package(body)
+
+
+def test_empty_window_400_errorcode_100_completes_with_zero_records(tmp_path):
+    body = b'{"errorCode": 100, "message": "No Records found for Date Range [\'2026-11-21T00:00:00Z\'-\'2026-11-22T00:00:00Z\']"}'
+    c, calls, _ = client([(400, {"Content-Type": "application/json"}, body)])
+    with Repository(tmp_path / "db") as repo:
+        run = fetch_window(repo, c, tmp_path / "raw", "contractLastModified", START, END, AT)
+        assert run["state"] == "complete" and run["records"] == 0 and run["pages"] == 1
+        assert repo.checkpoint("austender", "contractLastModified") == END
+
+
+def test_other_400_still_fails(tmp_path):
+    c, _, _ = client([(400, {}, b'{"errorCode": 7, "message": "Bad date"}')])
+    with Repository(tmp_path / "db") as repo:
+        run = fetch_window(repo, c, tmp_path / "raw", "contractLastModified", START, END, AT)
+        assert run["state"] == "failed" and repo.checkpoint("austender", "contractLastModified") is None

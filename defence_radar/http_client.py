@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
+import json
 import time
 from urllib.error import HTTPError, URLError
 from urllib.parse import urljoin
@@ -12,6 +13,24 @@ from .policy import validate_fetch_url
 
 class FetchError(ValueError):
     pass
+
+
+class NoRecordsError(FetchError):
+    """The CN API's documented empty-window answer (HTTP 400, errorCode 100)."""
+    def __init__(self, response):
+        super().__init__("No records found for date range")
+        self.response = response
+
+
+def is_no_records(response):
+    if response.status != 400:
+        return False
+    try:
+        data = json.loads(response.body)
+    except (ValueError, UnicodeError):
+        return False
+    return (isinstance(data, dict) and data.get("errorCode") == 100
+            and str(data.get("message", "")).startswith("No Records found"))
 
 
 @dataclass
@@ -95,6 +114,8 @@ class HttpClient:
                     continue
                 if response.status == 200:
                     return response
+                if is_no_records(response):
+                    raise NoRecordsError(response)
                 attempt += 1
                 if response.status not in (429, 500, 502, 503, 504) or attempt >= self.attempts:
                     raise FetchError(f"HTTP {response.status}; request stopped")
