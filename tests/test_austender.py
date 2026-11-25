@@ -124,3 +124,32 @@ def test_other_400_still_fails(tmp_path):
     with Repository(tmp_path / "db") as repo:
         run = fetch_window(repo, c, tmp_path / "raw", "contractLastModified", START, END, AT)
         assert run["state"] == "failed" and repo.checkpoint("austender", "contractLastModified") is None
+
+
+def test_notice_page_url_from_award_id_and_supplier_enrichment(tmp_path):
+    from defence_radar.ingest.austender import notice_url
+    # Verified pair (25 Nov 2026): API awardID suffix == public CN page GUID.
+    assert notice_url({"awardID": "CN3954729-ffe437df1cc74959b8a430c96c25fcfa"}) == \
+        "https://www.tenders.gov.au/Cn/Show/ffe437df-1cc7-4959-b8a4-30c96c25fcfa"
+    assert notice_url({"awardID": "CN385455-A2-62eff52de613d2a913b4473c2db77455"}).endswith("/62eff52d-e613-d2a9-13b4-473c2db77455")
+    assert notice_url({}) is None and notice_url({"awardID": "garbage"}) is None
+    package = {"license": "https://creativecommons.org/licenses/by/3.0/au/", "releases": [{
+        "ocid": "prod-1", "id": "prod-1-r", "date": "2026-11-16T02:34:55Z", "tag": ["contract"],
+        "tender": {"procurementMethodDetails": "Limited tender"},
+        "parties": [{"id": "s1", "name": "DELTA HYDRAULICS PTY LTD", "roles": ["supplier"],
+                     "address": {"locality": "HENDERSON", "region": "WA", "postalCode": "6166"},
+                     "contactPoint": {"branch": "NSSG - Maritime Sustainment Division", "division": "NSSG"}},
+                    {"id": "b", "name": "Department of Defence", "roles": ["procuringEntity"]}],
+        "awards": [{"id": "CN1-0123456789abcdef0123456789abcdef", "suppliers": [{"id": "s1", "name": "DELTA HYDRAULICS PTY LTD"}]}],
+        "contracts": [{"id": "CN1", "awardID": "CN1-0123456789abcdef0123456789abcdef", "description": "Hydraulic Components",
+                       "dateSigned": "2026-11-16T02:34:55Z", "value": {"amount": "1000.00", "currency": "AUD"},
+                       "items": [{"classification": {"scheme": "UNSPSC", "id": "25170000"}}]}]}]}
+    snap = save_snapshot(tmp_path, "austender", URL, json.dumps(package).encode(), AT)
+    rec = normalize(package, snap)[0]
+    assert rec.sources[0]["url"] == "https://www.tenders.gov.au/Cn/Show/01234567-89ab-cdef-0123-456789abcdef"
+    assert rec.sources[0]["api_url"] == URL
+    assert rec.prime == "DELTA HYDRAULICS PTY LTD"
+    f = rec.evidence_flags
+    assert f["suppliers"][0] == {"name": "DELTA HYDRAULICS PTY LTD", "locality": "Henderson", "region": "WA", "postcode": "6166"}
+    assert f["buyer_branch"] == "NSSG - Maritime Sustainment Division" and f["procurement_method"] == "Limited tender"
+    assert rec.source_published_at == "2026-11-16T02:34:55Z" and not rec.locations  # supplier address is never a worksite

@@ -6,7 +6,7 @@ from zoneinfo import ZoneInfo
 
 from .models import Opportunity, RecordKind, StatusClass, Lifecycle, ReviewState, PublicationState, utc_datetime, utc_iso
 
-RULE_VERSION = "status-1"
+RULE_VERSION = "status-2"
 INACTIVE = {"closed", "awarded", "cancelled", "superseded"}
 CONTEXT = {"contract_context", "registration_context", "readiness_context"}
 
@@ -53,7 +53,7 @@ def classify(record, as_of):
     def decide(rule, reason, status=None, lifecycle=None, held=False):
         result.rule_ids = [f"{RULE_VERSION}:{rule}"]
         result.classification_reason = reason
-        result.status_class = StatusClass(status) if status else None
+        result.status_class = StatusClass(status or ("held" if held else "context_only"))
         if lifecycle:
             result.lifecycle = Lifecycle(lifecycle)
         if held:
@@ -70,16 +70,16 @@ def classify(record, as_of):
     if "austender" in result.source_ids or set(flags.get("tags", [])) & {"contract", "contractAmendment"}:
         result.record_kind = RecordKind.contract_context
         result.publication_state = PublicationState.context_only
-        return decide("CN_CONTEXT", "Published contract notice/amendment; awarded contract context, with no verified submission invitation.", lifecycle="awarded")
+        return decide("CN_CONTEXT", "Awarded contract notice: shows who won what. It is market context, not an opportunity to bid.", "awarded_context", lifecycle="awarded")
     if flags.get("registration_only") or re.search(r"\bkeep me updated\b|\bnewsletter\b", result.title, re.I):
         result.record_kind = RecordKind.registration_context
     if result.record_kind.value in CONTEXT:
         result.publication_state = PublicationState.context_only
         return decide("CONTEXT", "Registration, readiness or existing-supplier context is not a current work package.")
     if result.lifecycle.value in INACTIVE:
-        return decide("INACTIVE", f"Official lifecycle is {result.lifecycle.value}; excluded from current alerts.")
+        return decide("INACTIVE", f"Official lifecycle is {result.lifecycle.value}; excluded from current alerts.", "inactive")
     if result.close_at_utc and now >= utc_datetime(result.close_at_utc):
-        return decide("DEADLINE_PASSED", "The exact submission deadline has passed; no award is inferred.", lifecycle="closed")
+        return decide("DEADLINE_PASSED", "The exact submission deadline has passed; no award is inferred.", "inactive", lifecycle="closed")
     evidence_ids = {s["evidence_id"] for s in result.sources}
     if result.review_state != ReviewState.reviewed or not result.classification_evidence or not set(result.classification_evidence) <= evidence_ids:
         return decide("REVIEW", "Status evidence is absent, unreviewed or lacks a valid source reference.", held=True)

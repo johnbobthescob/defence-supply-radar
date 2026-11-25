@@ -92,3 +92,11 @@ def test_fractional_event_order_and_equivalent_timezone_conflicts(tmp_path):
         assert repo.get_record("opp-1").title == "later"
         repo.save_record(record(title="conflict"), "2026-01-01T08:00:00.500+08:00")
         assert repo.get_record("opp-1").review_state.value == "needs_review"
+
+
+def test_newer_normalizer_supersedes_without_conflict(tmp_path):
+    with Repository(tmp_path/"db") as repo:
+        repo.save_record(record(title="old"), "2026-01-01T00:00:00Z")
+        repo.save_record(record(title="enriched", evidence_flags={"normalizer": "cn-2"}), "2026-01-01T00:00:00Z")
+        current = repo.get_record("opp-1")
+        assert current.title == "enriched" and current.review_state.value != "needs_review"

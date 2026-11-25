@@ -14,6 +14,10 @@ class RecordKind(StrEnum):
     procurement="procurement"; planned_scope="planned_scope"; hypothesis="hypothesis"; contract_context="contract_context"; registration_context="registration_context"; readiness_context="readiness_context"
 class StatusClass(StrEnum):
     confirmed_open="confirmed_open"; published_future_scope="published_future_scope"; speculative="speculative"
+    # Non-opportunity classes: every classified record carries an explicit state and reason.
+    awarded_context="awarded_context"; context_only="context_only"; inactive="inactive"; held="held"
+
+OPPORTUNITY_CLASSES = {"confirmed_open", "published_future_scope", "speculative"}
 class Lifecycle(StrEnum):
     open="open"; planned="planned"; ongoing_scope="ongoing_scope"; closed="closed"; awarded="awarded"; cancelled="cancelled"; superseded="superseded"; unknown="unknown"
 class ReviewState(StrEnum):
@@ -214,10 +218,11 @@ class Profile:
 
 @dataclass
 class MatchResult:
-    opportunity_id:str; profile_id:str; profile_hash:str; taxonomy_version:int; rule_version:str; score:int; components:dict=field(default_factory=dict); matched_capabilities:list[str]=field(default_factory=list); missing_capabilities:list[str]=field(default_factory=list); evidence:list[str]=field(default_factory=list); exclusions:list[str]=field(default_factory=list); eligibility:dict=field(default_factory=dict); shortlist:bool=False
+    opportunity_id:str; profile_id:str; profile_hash:str; taxonomy_version:int; rule_version:str; score:int; components:dict=field(default_factory=dict); reasons:list[str]=field(default_factory=list); band:str="low"; matched_capabilities:list[str]=field(default_factory=list); missing_capabilities:list[str]=field(default_factory=list); evidence:list[str]=field(default_factory=list); exclusions:list[str]=field(default_factory=list); eligibility:dict=field(default_factory=dict); shortlist:bool=False
     def validate(self):
         if isinstance(self.score,bool) or not isinstance(self.score,int) or not 0<=self.score<=100: raise ValueError("score: expected integer 0..100")
         if not isinstance(self.shortlist,bool): raise ValueError("shortlist: expected boolean")
         for f in ("components","eligibility"): _dict(getattr(self,f),f)
-        for f in ("matched_capabilities","missing_capabilities","evidence","exclusions"): _list(getattr(self,f),f,str)
+        for f in ("reasons","matched_capabilities","missing_capabilities","evidence","exclusions"): _list(getattr(self,f),f,str)
+        if self.band not in {"strong","good","possible","low"}: raise ValueError("band: invalid value")
         return self

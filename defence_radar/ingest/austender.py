@@ -62,6 +62,46 @@ def agency(release):
     return release.get("buyer", {}).get("name", ""), "buyer (fallback)"
 
 
+NORMALIZER = "cn-2"  # bump when derived fields change; newer normalisations supersede, not conflict
+NOTICE_PAGE = "https://www.tenders.gov.au/Cn/Show/"
+
+
+def notice_url(contract):
+    """Public AusTender CN page. Verified 25 Nov 2026 against API data: the page GUID is the
+    32-hex suffix of contracts[].awardID (e.g. CN3954729 -> /Cn/Show/ffe437df-1cc7-4959-b8a4-30c96c25fcfa)."""
+    award = str(contract.get("awardID") or "")
+    m = re.fullmatch(r"CN[0-9A-Za-z-]*?-([0-9a-fA-F]{32})", award)
+    if not m:
+        return None
+    h = m[1].lower()
+    return f"{NOTICE_PAGE}{h[:8]}-{h[8:12]}-{h[12:16]}-{h[16:20]}-{h[20:]}"
+
+
+def suppliers(release, contract):
+    """Suppliers named on the award this contract belongs to (falls back to supplier parties)."""
+    parties = {p.get("id"): p for p in release.get("parties", [])}
+    award = next((a for a in release.get("awards", []) if a.get("id") == contract.get("awardID")), None)
+    named = (award or {}).get("suppliers") or [p for p in release.get("parties", []) if "supplier" in p.get("roles", [])]
+    result = []
+    for s in named:
+        party = parties.get(s.get("id"), s)
+        addr = party.get("address") or {}
+        result.append({"name": (party.get("name") or s.get("name") or "").strip(),
+                       "locality": (addr.get("locality") or "").strip().title(),
+                       "region": (addr.get("region") or "").strip().upper(),
+                       "postcode": (addr.get("postalCode") or "").strip()})
+    return [x for x in result if x["name"]]
+
+
+def buyer_unit(release):
+    """Agency branch/division recorded on the notice contact point (supplier party in this API)."""
+    for party in release.get("parties", []):
+        cp = party.get("contactPoint") or {}
+        if cp.get("branch") or cp.get("division"):
+            return (cp.get("branch") or "").strip(), (cp.get("division") or "").strip()
+    return "", ""
+
+
 def normalize(package, snapshot):
     """Keep Defence agency context; marine relevance is explicit, never a location guess."""
     result = []
@@ -78,15 +118,21 @@ def normalize(package, snapshot):
             description = contract.get("description", "")
             # The process OCID is stable across contract amendments; retain official IDs verbatim.
             identity = f"cn:{release['ocid']}" if len(release["contracts"]) == 1 else f"cn:{release['ocid']}:{official_id}"
-            source = dict(source_id="austender", url=snapshot["url"], accessed_at=snapshot["accessed_at"],
+            page = notice_url(contract)
+            source = dict(source_id="austender", url=page or snapshot["url"], api_url=snapshot["url"],
+                          accessed_at=snapshot["accessed_at"],
                           evidence_id=evidence_id, snapshot_sha256=snapshot["sha256"], pointer=pointer,
                           notice_id=official_id, release_id=release["id"], source_date=release.get("date"))
+            named = suppliers(release, contract)
+            branch, division = buyer_unit(release)
+            tender = release.get("tender") or {}
             result.append(Opportunity(
                 id=identity, source_record_id=official_id, source_ids=["austender"],
                 title=description or contract.get("title") or official_id, summary=description,
-                buyer=buyer, record_kind="contract_context", lifecycle="awarded", review_state="reviewed",
+                buyer=buyer, prime="; ".join(x["name"] for x in named), record_kind="contract_context", lifecycle="awarded", review_state="reviewed",
                 publication_state="context_only", sources=[source], rights=["austender"],
                 close_precision="not_applicable", contract_period=contract.get("period", {}),
+                source_published_at=contract.get("dateSigned") or release.get("date"),
                 source_modified_at=release.get("date"), first_seen_at=snapshot["accessed_at"],
                 last_seen_at=snapshot["accessed_at"], verified_at=snapshot["accessed_at"],
                 attribution=[ATTRIBUTION] if package.get("license") == LICENCE else [],
@@ -96,7 +142,11 @@ def normalize(package, snapshot):
                                 "package_licence": package.get("license"), "ocid": release["ocid"],
                                 "release_id": release["id"], "tags": release.get("tag", []),
                                 "buyer_mapping": buyer_method, "marine_candidate": bool(MARINE.search(description)),
-                                "unspsc": [item.get("classification", {}) for item in contract.get("items", [])]},
+                                "unspsc": [item.get("classification", {}) for item in contract.get("items", [])],
+                                "normalizer": NORMALIZER, "suppliers": named, "buyer_branch": branch, "buyer_division": division,
+                                "procurement_method": tender.get("procurementMethodDetails") or tender.get("procurementMethod") or "",
+                                "date_signed": contract.get("dateSigned"), "notice_page": page,
+                                "amendment": bool(re.search(r"-A\d+$", official_id)) or "contractAmendment" in release.get("tag", [])},
                 warnings=[] if package.get("license") == LICENCE else ["Package has no established licence declaration; held from export."],
             ))
     return result

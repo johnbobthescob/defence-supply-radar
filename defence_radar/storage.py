@@ -122,7 +122,11 @@ class Repository:
         raw = canonical_json(record.to_dict())
         self.connection.execute("INSERT OR IGNORE INTO records(id) VALUES(?)", (record.id,))
         versions = self.connection.execute("SELECT hash,event_at,payload FROM record_versions WHERE id=?", (record.id,)).fetchall()
-        equal = [r for r in versions if _event_order(r["event_at"]) == _event_order(event) and material_state(json.loads(r["payload"])) != material_state(record)]
+        norm = record.evidence_flags.get("normalizer")
+        def _norm(payload): return json.loads(payload).get("evidence_flags", {}).get("normalizer")
+        # A re-normalisation of the same release (newer normalizer) supersedes; it is not a source conflict.
+        equal = [r for r in versions if _event_order(r["event_at"]) == _event_order(event) and _norm(r["payload"]) == norm
+                 and material_state(json.loads(r["payload"])) != material_state(record)]
         self.connection.execute("INSERT OR IGNORE INTO record_versions(id,hash,payload,event_at,needs_review) VALUES(?,?,?,?,?)",
                                 (record.id,h,raw,event,int(bool(equal))))
         if equal:
@@ -146,7 +150,7 @@ class Repository:
         if row[1]:
             record.review_state = "needs_review"
             record.publication_state = "held"
-            record.status_class = None
+            record.status_class = "held"
             record.evidence_flags["conflicting_versions"] = True
             record.warnings.append("Conflicting equal-time source versions require review.")
             record.validate()

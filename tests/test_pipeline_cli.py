@@ -30,7 +30,7 @@ def test_terminal_fixture_build_has_complete_bundle_and_stable_hashes(tmp_path):
         second=build_outputs(repo,profile,taxonomy,policies,AT,"2026-11-22","public",out)
     assert first["output_sha256"]==second["output_sha256"]
     assert {p.name:p.read_bytes() for p in out.iterdir()}==one
-    assert set(one)=={"briefing-2026-11-24.md","work-packages.json","work-packages.csv","work-packages.html","assessment-fictional-henderson-marine-sme.md","assessment-fictional-henderson-marine-sme.html","coverage.json","manifest.json"}
+    assert set(one)=={"briefing-2026-11-22.md","work-packages.json","work-packages.csv","work-packages.html","assessment-fictional-henderson-marine-sme.md","assessment-fictional-henderson-marine-sme.html","coverage.json","manifest.json"}
     manifest=json.loads(one["manifest.json"])
     assert all(hashlib.sha256(one[n]).hexdigest()==h for n,h in manifest["output_sha256"].items())
     assert "private" not in one["manifest.json"].decode().lower()

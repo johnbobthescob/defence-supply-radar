@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "categories": {
     "marine_electrical": {
       "label": "Marine electrical",
@@ -11,7 +11,39 @@
         "switchboard",
         "electrical generation"
       ],
-      "weight": 2
+      "weight": 2,
+      "keywords": {
+        "electrical": 25,
+        "electric": 20,
+        "cable": 25,
+        "cables": 25,
+        "cabling": 25,
+        "switchboard": 30,
+        "switchboards": 30,
+        "switchgear": 30,
+        "generator": 25,
+        "generators": 25,
+        "alternator": 25,
+        "power distribution": 25,
+        "circuit breaker": 25,
+        "lighting": 15,
+        "floodlights": 15,
+        "motor": 15,
+        "motors": 15,
+        "battery": 15,
+        "batteries": 15,
+        "power supplies": 15,
+        "power sources": 15
+      },
+      "unspsc": {
+        "2612": 30,
+        "3912": 30,
+        "2611": 25,
+        "2613": 25,
+        "2610": 20,
+        "3911": 15,
+        "3910": 10
+      }
     },
     "fabrication_welding": {
       "label": "Fabrication and welding",
@@ -21,7 +53,19 @@
         "welding",
         "welded assemblies"
       ],
-      "weight": 2
+      "weight": 2,
+      "keywords": {
+        "fabrication": 30,
+        "welding": 35,
+        "welded": 30,
+        "steelwork": 25,
+        "structural steel": 25,
+        "sheet metal": 25
+      },
+      "unspsc": {
+        "3010": 15,
+        "7318": 10
+      }
     },
     "precision_machining": {
       "label": "Precision machining",
@@ -30,7 +74,18 @@
         "precision machining",
         "turning and milling"
       ],
-      "weight": 2
+      "weight": 2,
+      "keywords": {
+        "machining": 35,
+        "machined": 30,
+        "cnc": 30,
+        "turning": 10,
+        "milling": 20
+      },
+      "unspsc": {
+        "7318": 35,
+        "3117": 10
+      }
     },
     "corrosion_preservation": {
       "label": "Corrosion and preservation",
@@ -42,7 +97,28 @@
         "cathodic protection",
         "anodes"
       ],
-      "weight": 2
+      "weight": 2,
+      "keywords": {
+        "corrosion": 35,
+        "coating": 30,
+        "coatings": 30,
+        "paint": 30,
+        "paints": 30,
+        "painting": 30,
+        "blasting": 25,
+        "antifouling": 30,
+        "anti fouling": 30,
+        "anode": 30,
+        "anodes": 30,
+        "cathodic": 30,
+        "preservation": 20,
+        "sealing compounds": 10
+      },
+      "unspsc": {
+        "3121": 35,
+        "1512": 10,
+        "3120": 10
+      }
     },
     "hydraulics_pneumatics": {
       "label": "Hydraulics and pneumatics",
@@ -54,7 +130,35 @@
         "stabilisers",
         "pneumatics"
       ],
-      "weight": 2
+      "weight": 2,
+      "keywords": {
+        "hydraulic": 35,
+        "hydraulics": 35,
+        "pneumatic": 30,
+        "pneumatics": 30,
+        "actuator": 20,
+        "actuators": 20,
+        "pump": 20,
+        "pumps": 20,
+        "hose": 20,
+        "hoses": 20,
+        "valve": 15,
+        "valves": 15,
+        "steering gear": 30,
+        "stabiliser": 25,
+        "stabilisers": 25,
+        "winch": 20,
+        "winches": 20
+      },
+      "unspsc": {
+        "2712": 35,
+        "2713": 30,
+        "3125": 30,
+        "4015": 25,
+        "4014": 15,
+        "3118": 10,
+        "4018": 10
+      }
     },
     "piping_fluid_systems": {
       "label": "Piping and fluid systems",
@@ -65,7 +169,27 @@
         "fuel transfer",
         "fluid systems"
       ],
-      "weight": 2
+      "weight": 2,
+      "keywords": {
+        "pipework": 35,
+        "piping": 30,
+        "pipe": 25,
+        "pipes": 25,
+        "fittings": 10,
+        "valve": 15,
+        "valves": 15,
+        "pump": 15,
+        "pumps": 15,
+        "fuel transfer": 30,
+        "filter elements": 10
+      },
+      "unspsc": {
+        "4017": 35,
+        "4018": 25,
+        "4014": 25,
+        "4016": 15,
+        "4015": 15
+      }
     },
     "propulsion_rotating_equipment": {
       "label": "Propulsion and rotating equipment",
@@ -76,7 +200,24 @@
         "gearboxes",
         "drivetrain"
       ],
-      "weight": 2
+      "weight": 2,
+      "keywords": {
+        "propulsion": 35,
+        "gearbox": 30,
+        "gearboxes": 30,
+        "engine": 20,
+        "engines": 20,
+        "shaft": 20,
+        "propeller": 30,
+        "diesel": 20,
+        "gas turbine": 35,
+        "bearings": 15
+      },
+      "unspsc": {
+        "2610": 10,
+        "3117": 15,
+        "2611": 10
+      }
     },
     "vessel_maintenance_docking": {
       "label": "Vessel maintenance and docking",
@@ -87,7 +228,22 @@
         "hull repair",
         "ship repair"
       ],
-      "weight": 2
+      "weight": 2,
+      "keywords": {
+        "watercraft maintenance": 35,
+        "vessel maintenance": 35,
+        "ship repair": 35,
+        "docking": 30,
+        "slipway": 30,
+        "hull": 25,
+        "refit": 30,
+        "dry dock": 35,
+        "drydock": 35
+      },
+      "unspsc": {
+        "251117": 15,
+        "7818": 10
+      }
     },
     "hvac_refrigeration": {
       "label": "HVAC and refrigeration",
@@ -97,7 +253,19 @@
         "chilled water",
         "air conditioning"
       ],
-      "weight": 2
+      "weight": 2,
+      "keywords": {
+        "hvac": 35,
+        "refrigeration": 35,
+        "air conditioning": 35,
+        "chiller": 30,
+        "chillers": 30,
+        "ventilation": 25
+      },
+      "unspsc": {
+        "4010": 35,
+        "2413": 25
+      }
     },
     "instrumentation_controls": {
       "label": "Instrumentation and controls",
@@ -106,7 +274,21 @@
         "control panels",
         "platform controls"
       ],
-      "weight": 2
+      "weight": 2,
+      "keywords": {
+        "instrumentation": 30,
+        "calibration": 25,
+        "control panel": 30,
+        "control systems": 25,
+        "sensors": 20,
+        "measuring instruments": 25,
+        "measurement instruments": 25
+      },
+      "unspsc": {
+        "4111": 30,
+        "3125": 15,
+        "4110": 10
+      }
     },
     "inspection_assurance": {
       "label": "Inspection and assurance",
@@ -116,7 +298,20 @@
         "NDT",
         "metrology"
       ],
-      "weight": 2
+      "weight": 2,
+      "keywords": {
+        "inspection": 30,
+        "inspections": 30,
+        "ndt": 35,
+        "non destructive": 35,
+        "survey": 20,
+        "testing services": 20,
+        "metrology": 30
+      },
+      "unspsc": {
+        "8114": 20,
+        "8115": 20
+      }
     },
     "lifting_access_support": {
       "label": "Lifting and access support",
@@ -126,7 +321,22 @@
         "scaffolding",
         "lifting equipment"
       ],
-      "weight": 2
+      "weight": 2,
+      "keywords": {
+        "crane": 30,
+        "cranes": 30,
+        "rigging": 30,
+        "scaffolding": 35,
+        "lifting": 30,
+        "hoist": 25,
+        "work stands": 20,
+        "anchor chain": 20
+      },
+      "unspsc": {
+        "2410": 25,
+        "3019": 15,
+        "3115": 15
+      }
     },
     "cleaning_environmental_services": {
       "label": "Cleaning and environmental services",
@@ -135,7 +345,21 @@
         "oily water",
         "vessel cleaning"
       ],
-      "weight": 2
+      "weight": 2,
+      "keywords": {
+        "tank cleaning": 35,
+        "cleaning": 20,
+        "oily water": 30,
+        "remediation": 20,
+        "waste": 15,
+        "environmental management": 20
+      },
+      "unspsc": {
+        "7611": 25,
+        "7610": 25,
+        "7612": 20,
+        "7710": 15
+      }
     },
     "engineering_logistics_support": {
       "label": "Engineering and logistics support",
@@ -145,7 +369,19 @@
         "integrated logistics",
         "warehousing"
       ],
-      "weight": 2
+      "weight": 2,
+      "keywords": {
+        "engineering services": 30,
+        "design": 15,
+        "logistics": 25,
+        "warehousing": 25,
+        "storage services": 20,
+        "integrated logistics": 30
+      },
+      "unspsc": {
+        "8110": 25,
+        "7813": 15
+      }
     }
   }
 }

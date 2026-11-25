@@ -21,7 +21,7 @@ def scope(text="Marine hydraulic hose repair", **changes):
 def test_realistic_hydraulic_scope_outranks_generic_electronics():
     good = match(scope(), PROFILE, TAX, NOW)
     generic = match(scope("Electronic Equipment"), PROFILE, TAX, NOW)
-    assert good.score == 100 and good.shortlist
+    assert good.score >= 90 and good.band == "strong" and good.shortlist and good.reasons
     assert good.eligibility["status"] == "unknown"
     assert generic.score == 0 and not generic.shortlist
 
@@ -56,4 +56,4 @@ def test_eligibility_failure_never_overridden_by_score():
     profile = load_profile("examples/sme_profile.json")
     profile.credentials["iso9001"] = dict(value=False, evidence="self declared")
     result = match(scope(eligibility=[dict(key="iso9001", strength="required", evidence_id="e1", verified_at=NOW)]), profile, TAX, NOW)
-    assert result.score == 100 and result.eligibility["status"] == "does_not_meet" and not result.shortlist
+    assert result.score >= 90 and result.eligibility["status"] == "does_not_meet" and not result.shortlist

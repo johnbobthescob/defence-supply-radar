@@ -99,7 +99,7 @@ def build_outputs(repo, profile, taxonomy, policies, as_of, period, audience, ou
         if failures: raise StrictCoverageError("strict build refused: live source coverage is incomplete or stale")
     payload = prepare_payload(repo, profile, taxonomy, policies, as_of, str(period), audience, include_speculative, coverage)
     files = {
-        f"briefing-{as_of[:10]}.md": render_briefing(payload),
+        f"briefing-{period}.md": render_briefing(payload),
         "work-packages.json": render_json(payload), "work-packages.csv": render_csv(payload),
         "work-packages.html": render_html(payload),
         f"assessment-{pid}.md": render_assessment_md(payload),

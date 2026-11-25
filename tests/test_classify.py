@@ -1,5 +1,6 @@
 from copy import deepcopy
 import pytest
+from defence_radar.models import OPPORTUNITY_CLASSES
 from defence_radar.classify import classify, parse_close
 from defence_radar.eligibility import evaluate, extract_requirements
 from defence_radar.config import load_profile
@@ -35,7 +36,7 @@ def test_specific_eoi_and_unknown_eligibility():
 ])
 def test_inactive(changes, life):
     result = classify(opportunity(**changes), NOW)
-    assert result.status_class is None and result.lifecycle.value == life
+    assert result.status_class.value == "inactive" and result.lifecycle.value == life and result.classification_reason
 
 
 @pytest.mark.parametrize("changes", [
@@ -49,7 +50,10 @@ def test_inactive(changes, life):
     {"evidence_flags": {"authoritative_scope": True, "accepting_submissions": True, "opens_at": "2026-11-24T00:00:00Z"}},
 ])
 def test_cannot_claim_open(changes):
-    assert classify(opportunity(**changes), NOW).status_class is None
+    result = classify(opportunity(**changes), NOW)
+    assert result.status_class.value not in OPPORTUNITY_CLASSES and result.classification_reason
+    expected = "awarded_context" if "austender" in changes.get("source_ids", []) else "context_only" if changes.get("title") == "Keep Me Updated" or changes.get("record_kind") == "registration_context" else "held"
+    assert result.status_class.value == expected
 
 
 def test_all_future_hypothesis_ongoing_gates():
@@ -57,7 +61,7 @@ def test_all_future_hypothesis_ongoing_gates():
     plan = opportunity(record_kind="planned_scope", evidence_flags=flags, close_at_utc=None, close_precision="not_published", conditions=["Subject to commercial viability"])
     result = classify(plan, NOW)
     assert result.status_class.value == "published_future_scope" and result.conditions == plan.conditions
-    assert classify(plan, "2026-12-24T02:00:01Z").status_class is None
+    assert classify(plan, "2026-12-24T02:00:01Z").status_class.value == "held"
     hypothesis = opportunity(record_kind="hypothesis", evidence_flags={"hypothesis_reason": "Official capacity expansion may require trade input", "missing_evidence": ["No package or buyer commitment"]}, close_at_utc=None, close_precision="not_published")
     assert classify(hypothesis, NOW).status_class.value == "speculative"
     ongoing = opportunity(close_at_utc=None, close_precision="ongoing_explicit", evidence_flags={"authoritative_scope": True, "accepting_submissions": True, "ongoing_intake": True})
